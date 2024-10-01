@@ -19,15 +19,15 @@
   <meta name="author" content="锋">
   <meta name="keywords" content="">
   
-    <meta name="description" content="在一个无序数组中，找到起点为偶数，子数组为奇偶交替，并且所有元素不能超过threshold的子数组，返回满足条件的最长子数组长度。">
+    <meta name="description" content="给定字符串，找出含有元音字母最多的定长子字符串，并返回该字符串中的元音数量。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Leetcode-longest-even-odd-subarray-with-threshold">
-<meta property="og:url" content="https://astronaut-diode.github.io/2024/10/01/Leetcode-longest-even-odd-subarray-with-threshold/index.html">
+<meta property="og:title" content="Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length">
+<meta property="og:url" content="https://astronaut-diode.github.io/2024/10/01/Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length/index.html">
 <meta property="og:site_name" content="锋的博客">
-<meta property="og:description" content="在一个无序数组中，找到起点为偶数，子数组为奇偶交替，并且所有元素不能超过threshold的子数组，返回满足条件的最长子数组长度。">
+<meta property="og:description" content="给定字符串，找出含有元音字母最多的定长子字符串，并返回该字符串中的元音数量。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-10-01T08:04:29.000Z">
-<meta property="article:modified_time" content="2024-10-01T09:20:23.881Z">
+<meta property="article:published_time" content="2024-10-01T11:17:30.000Z">
+<meta property="article:modified_time" content="2024-10-01T11:31:06.649Z">
 <meta property="article:author" content="锋">
 <meta property="article:tag" content="Leetcode">
 <meta property="article:tag" content="滑动窗口">
@@ -35,7 +35,7 @@
   
   
   
-  <title>Leetcode-longest-even-odd-subarray-with-threshold - 锋的博客</title>
+  <title>Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length - 锋的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -201,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Leetcode-longest-even-odd-subarray-with-threshold"></span>
+            <span id="subtitle" data-typed-text="Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length"></span>
           
         </div>
 
@@ -217,8 +217,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-10-01 16:04" pubdate>
-          星期二, 十月 1日 2024, 4:04 下午
+        <time datetime="2024-10-01 19:17" pubdate>
+          星期二, 十月 1日 2024, 7:17 晚上
         </time>
       </span>
     
@@ -230,7 +230,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          620 字
+          409 字
         
       </span>
     
@@ -242,7 +242,7 @@
         
         
           <!-- compatible with older versions-->
-          6 分钟
+          4 分钟
         
       </span>
     
@@ -296,46 +296,44 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Leetcode-longest-even-odd-subarray-with-threshold</h1>
+            <h1 id="seo-header">Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length</h1>
             
             
               <div class="markdown-body">
                 
                 <h2 id="题目描述">1 题目描述</h2>
-<p>给你一个下标从 <strong>0</strong> 开始的整数数组 <code>nums</code>
-和一个整数 <code>threshold</code> 。</p>
-<p>请你从 <code>nums</code> 的子数组中找出以下标 <code>l</code>
-开头、下标 <code>r</code> 结尾
-<code>(0 &lt;= l &lt;= r &lt; nums.length)</code> 且满足以下条件的
-<strong>最长子数组</strong> ：</p>
-<ul>
-<li><code>nums[l] % 2 == 0</code></li>
-<li>对于范围 <code>[l, r - 1]</code> 内的所有下标 <code>i</code>
-，<code>nums[i] % 2 != nums[i + 1] % 2</code></li>
-<li>对于范围 <code>[l, r]</code> 内的所有下标 <code>i</code>
-，<code>nums[i] &lt;= threshold</code></li>
-</ul>
-<p>以整数形式返回满足题目要求的最长子数组的长度。</p>
-<p><strong>注意：子数组</strong> 是数组中的一个连续非空元素序列。</p>
+<p>给你字符串 <code>s</code> 和整数 <code>k</code> 。</p>
+<p>请返回字符串 <code>s</code> 中长度为 <code>k</code>
+的单个子字符串中可能包含的最大元音字母数。</p>
+<p>英文中的 <strong>元音字母</strong> 为（<code>a</code>,
+<code>e</code>, <code>i</code>, <code>o</code>, <code>u</code>）。</p>
 <p><strong>示例 1：</strong></p>
-<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs tap">输入：nums = [3,2,5,4], threshold = 5<br>输出：3<br>解释：在这个示例中，我们选择从 l =<span class="hljs-number"> 1 </span>开始、到 r =<span class="hljs-number"> 3 </span>结束的子数组 =&gt; [2,5,4] ，满足上述条件。<br>因此，答案就是这个子数组的长度<span class="hljs-number"> 3 </span>。可以证明<span class="hljs-number"> 3 </span>是满足题目要求的最大长度。<br></code></pre></td></tr></table></figure>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs nix">输入：<span class="hljs-attr">s</span> = <span class="hljs-string">&quot;abciiidef&quot;</span>, <span class="hljs-attr">k</span> = <span class="hljs-number">3</span><br>输出：<span class="hljs-number">3</span><br>解释：子字符串 <span class="hljs-string">&quot;iii&quot;</span> 包含 <span class="hljs-number">3</span> 个元音字母。<br></code></pre></td></tr></table></figure>
 <p><strong>示例 2：</strong></p>
-<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs tap">输入：nums = [1,2], threshold = 2<br>输出：1<br>解释：<br>在这个示例中，我们选择从 l =<span class="hljs-number"> 1 </span>开始、到 r =<span class="hljs-number"> 1 </span>结束的子数组 =&gt; [2] 。<br>该子数组满足上述全部条件。可以证明<span class="hljs-number"> 1 </span>是满足题目要求的最大长度。<br></code></pre></td></tr></table></figure>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs tap">输入：s = &quot;aeiou&quot;, k = 2<br>输出：2<br>解释：任意长度为<span class="hljs-number"> 2 </span>的子字符串都包含<span class="hljs-number"> 2 </span>个元音字母。<br></code></pre></td></tr></table></figure>
 <p><strong>示例 3：</strong></p>
-<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs tap">输入：nums = [2,3,4,5], threshold = 4<br>输出：3<br>解释：<br>在这个示例中，我们选择从 l =<span class="hljs-number"> 0 </span>开始、到 r =<span class="hljs-number"> 2 </span>结束的子数组 =&gt; [2,3,4] 。 <br>该子数组满足上述全部条件。<br>因此，答案就是这个子数组的长度<span class="hljs-number"> 3 </span>。可以证明<span class="hljs-number"> 3 </span>是满足题目要求的最大长度。<br></code></pre></td></tr></table></figure>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs nix">输入：<span class="hljs-attr">s</span> = <span class="hljs-string">&quot;leetcode&quot;</span>, <span class="hljs-attr">k</span> = <span class="hljs-number">3</span><br>输出：<span class="hljs-number">2</span><br>解释：<span class="hljs-string">&quot;lee&quot;</span>、<span class="hljs-string">&quot;eet&quot;</span> 和 <span class="hljs-string">&quot;ode&quot;</span> 都包含 <span class="hljs-number">2</span> 个元音字母。<br></code></pre></td></tr></table></figure>
+<p><strong>示例 4：</strong></p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs nix">输入：<span class="hljs-attr">s</span> = <span class="hljs-string">&quot;rhythms&quot;</span>, <span class="hljs-attr">k</span> = <span class="hljs-number">4</span><br>输出：<span class="hljs-number">0</span><br>解释：字符串 s 中不含任何元音字母。<br></code></pre></td></tr></table></figure>
+<p><strong>示例 5：</strong></p>
+<figure class="highlight nix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs nix">输入：<span class="hljs-attr">s</span> = <span class="hljs-string">&quot;tryhard&quot;</span>, <span class="hljs-attr">k</span> = <span class="hljs-number">4</span><br>输出：<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
 <p><strong>提示：</strong></p>
 <ul>
-<li><code>1 &lt;= nums.length &lt;= 100</code></li>
-<li><code>1 &lt;= nums[i] &lt;= 100</code></li>
-<li><code>1 &lt;= threshold &lt;= 100</code></li>
+<li><code>1 &lt;= s.length &lt;= 10^5</code></li>
+<li><code>s</code> 由小写英文字母组成</li>
+<li><code>1 &lt;= k &lt;= s.length</code></li>
 </ul>
 <h2 id="解法">2 解法</h2>
 <h3 id="滑动窗口">2.1 滑动窗口</h3>
-<p><strong>解法：</strong></p>
-<p>枚举左端点，需要是偶数并且不超过threshold。</p>
-<p>在符合条件的情况下不断移动右指针，当不符合条件，即可计算一次答案。</p>
-<p><strong>时间复杂度：</strong>虽然是双层循环，但是left和right加在一起也只会执行n次，所以时间复杂度是O(n)。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">longestAlternatingSubarray</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> threshold)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = nums.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> left = <span class="hljs-number">0</span>; left &lt; n; left++) &#123; <span class="hljs-comment">// 枚举左下标</span><br>            <span class="hljs-keyword">if</span> (nums[left] &gt; threshold || nums[left] % <span class="hljs-number">2</span> != <span class="hljs-number">0</span>) &#123; <span class="hljs-comment">// 不能以这个元素开头</span><br>                <span class="hljs-keyword">continue</span>;<br>            &#125;<br>            <span class="hljs-type">int</span> right = left + <span class="hljs-number">1</span>;<br>            <span class="hljs-keyword">while</span> (right &lt; n &amp;&amp; nums[right - <span class="hljs-number">1</span>] % <span class="hljs-number">2</span> != nums[right] % <span class="hljs-number">2</span> &amp;&amp; nums[right] &lt;= threshold) &#123; <span class="hljs-comment">// 移动右指针，找出满足条件的最大范围</span><br>                right++;<br>            &#125;<br>            ans = <span class="hljs-built_in">max</span>(ans, right - left); <span class="hljs-comment">// 在不满足条件的时候计算答案。</span><br>            left = right - <span class="hljs-number">1</span>;<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<p><strong>思路：</strong></p>
+<p>定长滑动窗口题目，构造好初始窗口后，计算答案。接着重复</p>
+<ul>
+<li>读取right</li>
+<li>弹出left</li>
+<li>计算答案</li>
+</ul>
+<p><strong>时间复杂度：</strong>O(n)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">maxVowels</span><span class="hljs-params">(string s, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>, n = s.<span class="hljs-built_in">size</span>(), memo[<span class="hljs-number">26</span>] = &#123;<span class="hljs-number">0</span>&#125;, ans = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">while</span>(right &lt; k) &#123;<br>            memo[s[right++] - <span class="hljs-string">&#x27;a&#x27;</span>]++;<br>        &#125;<br>        ans = <span class="hljs-built_in">max</span>(ans, memo[<span class="hljs-string">&#x27;a&#x27;</span> - <span class="hljs-string">&#x27;a&#x27;</span>] + memo[<span class="hljs-string">&#x27;e&#x27;</span> - <span class="hljs-string">&#x27;a&#x27;</span>] + memo[<span class="hljs-string">&#x27;i&#x27;</span> - <span class="hljs-string">&#x27;a&#x27;</span>] + memo[<span class="hljs-string">&#x27;o&#x27;</span> - <span class="hljs-string">&#x27;a&#x27;</span>] + memo[<span class="hljs-string">&#x27;u&#x27;</span> - <span class="hljs-string">&#x27;a&#x27;</span>]);<br>        <span class="hljs-keyword">while</span>(right &lt; n) &#123;<br>            memo[s[left++] - <span class="hljs-string">&#x27;a&#x27;</span>]--;<br>            memo[s[right++] - <span class="hljs-string">&#x27;a&#x27;</span>]++;<br>            ans = <span class="hljs-built_in">max</span>(ans, memo[<span class="hljs-string">&#x27;a&#x27;</span> - <span class="hljs-string">&#x27;a&#x27;</span>] + memo[<span class="hljs-string">&#x27;e&#x27;</span> - <span class="hljs-string">&#x27;a&#x27;</span>] + memo[<span class="hljs-string">&#x27;i&#x27;</span> - <span class="hljs-string">&#x27;a&#x27;</span>] + memo[<span class="hljs-string">&#x27;o&#x27;</span> - <span class="hljs-string">&#x27;a&#x27;</span>] + memo[<span class="hljs-string">&#x27;u&#x27;</span> - <span class="hljs-string">&#x27;a&#x27;</span>]);<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
                 
               </div>
@@ -390,8 +388,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Leetcode-longest-even-odd-subarray-with-threshold</div>
-      <div>https://astronaut-diode.github.io/2024/10/01/Leetcode-longest-even-odd-subarray-with-threshold/</div>
+      <div>Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length</div>
+      <div>https://astronaut-diode.github.io/2024/10/01/Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length/</div>
     </div>
     <div class="license-meta">
       
@@ -435,9 +433,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/10/01/Leetcode-count-complete-substring/" title="Leetcode-count-complete-substring">
+                      <a href="/2024/10/01/Leetcode-maximum-average-subarray-i/" title="Leetcode-maximum-average-subarray-i">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Leetcode-count-complete-substring</span>
+                        <span class="hidden-mobile">Leetcode-maximum-average-subarray-i</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -445,8 +443,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/10/01/Leetcode-3sum/" title="Leetcode-3sum">
-                        <span class="hidden-mobile">Leetcode-3sum</span>
+                      <a href="/2024/10/01/Leetcode-count-complete-substring/" title="Leetcode-count-complete-substring">
+                        <span class="hidden-mobile">Leetcode-count-complete-substring</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -545,7 +543,7 @@
       
         <a href="/2024/10/01/Leetcode-longest-even-odd-subarray-with-threshold/" title="Leetcode-longest-even-odd-subarray-with-threshold"
            class="list-group-item list-group-item-action
-           active">
+           ">
           <span class="category-post">Leetcode-longest-even-odd-subarray-with-threshold</span>
         </a>
       
@@ -563,7 +561,7 @@
       
         <a href="/2024/10/01/Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length/" title="Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length"
            class="list-group-item list-group-item-action
-           ">
+           active">
           <span class="category-post">Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length</span>
         </a>
       
