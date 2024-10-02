@@ -19,15 +19,15 @@
   <meta name="author" content="锋">
   <meta name="keywords" content="">
   
-    <meta name="description" content="子字符串中所有相邻字符相差不超过2，并且出现的所有字符种类都有k个字符的子字符串称为完全子字符串。返回给定字符串中所有的完全子字符串的数目。">
+    <meta name="description" content="给定字符串，找出其中长度为[minSize,maxSize]的子字符串，子串要求包含的字符数量不超过maxLetters，求出重复出现次数最多的符合要求的子串。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Leetcode-count-complete-substring">
-<meta property="og:url" content="https://astronaut-diode.github.io/2024/10/01/Leetcode-count-complete-substring/index.html">
+<meta property="og:title" content="Leetcode-maximum-number-of-occurrences-of-a-substring">
+<meta property="og:url" content="https://astronaut-diode.github.io/2024/10/02/Leetcode-maximum-number-of-occurrences-of-a-substring/index.html">
 <meta property="og:site_name" content="锋的博客">
-<meta property="og:description" content="子字符串中所有相邻字符相差不超过2，并且出现的所有字符种类都有k个字符的子字符串称为完全子字符串。返回给定字符串中所有的完全子字符串的数目。">
+<meta property="og:description" content="给定字符串，找出其中长度为[minSize,maxSize]的子字符串，子串要求包含的字符数量不超过maxLetters，求出重复出现次数最多的符合要求的子串。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-10-01T09:18:03.000Z">
-<meta property="article:modified_time" content="2024-10-01T14:23:15.825Z">
+<meta property="article:published_time" content="2024-10-02T05:12:52.000Z">
+<meta property="article:modified_time" content="2024-10-02T05:22:24.209Z">
 <meta property="article:author" content="锋">
 <meta property="article:tag" content="Leetcode">
 <meta property="article:tag" content="滑动窗口">
@@ -35,7 +35,7 @@
   
   
   
-  <title>Leetcode-count-complete-substring - 锋的博客</title>
+  <title>Leetcode-maximum-number-of-occurrences-of-a-substring - 锋的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -201,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Leetcode-count-complete-substring"></span>
+            <span id="subtitle" data-typed-text="Leetcode-maximum-number-of-occurrences-of-a-substring"></span>
           
         </div>
 
@@ -217,8 +217,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-10-01 17:18" pubdate>
-          星期二, 十月 1日 2024, 5:18 下午
+        <time datetime="2024-10-02 13:12" pubdate>
+          星期三, 十月 2日 2024, 1:12 下午
         </time>
       </span>
     
@@ -230,7 +230,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          1k 字
+          683 字
         
       </span>
     
@@ -242,7 +242,7 @@
         
         
           <!-- compatible with older versions-->
-          9 分钟
+          6 分钟
         
       </span>
     
@@ -296,50 +296,42 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Leetcode-count-complete-substring</h1>
+            <h1 id="seo-header">Leetcode-maximum-number-of-occurrences-of-a-substring</h1>
             
             
               <div class="markdown-body">
                 
                 <h2 id="题目描述">1 题目描述</h2>
-<p>给你一个字符串 <code>word</code> 和一个整数 <code>k</code> 。</p>
-<p>如果 <code>word</code> 的一个子字符串 <code>s</code>
-满足以下条件，我们称它是 <strong>完全字符串：</strong></p>
+<p>给你一个字符串 <code>s</code> ，请你返回满足以下条件且出现次数最大的
+<strong>任意</strong> 子串的出现次数：</p>
 <ul>
-<li><code>s</code> 中每个字符 <strong>恰好</strong> 出现 <code>k</code>
-次。</li>
-<li>相邻字符在字母表中的顺序 <strong>至多</strong> 相差 <code>2</code>
-。也就是说，<code>s</code> 中两个相邻字符 <code>c1</code> 和
-<code>c2</code> ，它们在字母表中的位置相差 <strong>至多</strong> 为
-<code>2</code> 。</li>
+<li>子串中不同字母的数目必须小于等于 <code>maxLetters</code> 。</li>
+<li>子串的长度必须大于等于 <code>minSize</code> 且小于等于
+<code>maxSize</code> 。</li>
 </ul>
-<p>请你返回 <code>word</code> 中 <strong>完全</strong>
-子字符串的数目。</p>
-<p><strong>子字符串</strong> 指的是一个字符串中一段连续
-<strong>非空</strong> 的字符序列。</p>
 <p><strong>示例 1：</strong></p>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs applescript">输入：<span class="hljs-built_in">word</span> = <span class="hljs-string">&quot;igigee&quot;</span>, k = <span class="hljs-number">2</span><br>输出：<span class="hljs-number">3</span><br>解释：完全子字符串需要满足每个字符恰好出现 <span class="hljs-number">2</span> 次，且相邻字符相差至多为 <span class="hljs-number">2</span> ：igigee, igigee, igigee 。<br></code></pre></td></tr></table></figure>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs pf">输入：s = <span class="hljs-string">&quot;aababcaab&quot;</span>, <span class="hljs-keyword">max</span>Letters = <span class="hljs-number">2</span>, <span class="hljs-keyword">min</span>Size = <span class="hljs-number">3</span>, <span class="hljs-keyword">max</span>Size = <span class="hljs-number">4</span><br>输出：<span class="hljs-number">2</span><br>解释：子串 <span class="hljs-string">&quot;aab&quot;</span> 在原字符串中出现了 <span class="hljs-number">2</span> 次。<br>它满足所有的要求：<span class="hljs-number">2</span> 个不同的字母，长度为 <span class="hljs-number">3</span> （在 <span class="hljs-keyword">min</span>Size 和 <span class="hljs-keyword">max</span>Size 范围内）。<br></code></pre></td></tr></table></figure>
 <p><strong>示例 2：</strong></p>
-<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs applescript">输入：<span class="hljs-built_in">word</span> = <span class="hljs-string">&quot;aaabbbccc&quot;</span>, k = <span class="hljs-number">3</span><br>输出：<span class="hljs-number">6</span><br>解释：完全子字符串需要满足每个字符恰好出现 <span class="hljs-number">3</span> 次，且相邻字符相差至多为 <span class="hljs-number">2</span> ：aaabbbccc, aaabbbccc, aaabbbccc, aaabbbccc, aaabbbccc, aaabbbccc 。<br></code></pre></td></tr></table></figure>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs pf">输入：s = <span class="hljs-string">&quot;aaaa&quot;</span>, <span class="hljs-keyword">max</span>Letters = <span class="hljs-number">1</span>, <span class="hljs-keyword">min</span>Size = <span class="hljs-number">3</span>, <span class="hljs-keyword">max</span>Size = <span class="hljs-number">3</span><br>输出：<span class="hljs-number">2</span><br>解释：子串 <span class="hljs-string">&quot;aaa&quot;</span> 在原字符串中出现了 <span class="hljs-number">2</span> 次，且它们有重叠部分。<br></code></pre></td></tr></table></figure>
+<p><strong>示例 3：</strong></p>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs pf">输入：s = <span class="hljs-string">&quot;aabcabcab&quot;</span>, <span class="hljs-keyword">max</span>Letters = <span class="hljs-number">2</span>, <span class="hljs-keyword">min</span>Size = <span class="hljs-number">2</span>, <span class="hljs-keyword">max</span>Size = <span class="hljs-number">3</span><br>输出：<span class="hljs-number">3</span><br></code></pre></td></tr></table></figure>
+<p><strong>示例 4：</strong></p>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs pf">输入：s = <span class="hljs-string">&quot;abcde&quot;</span>, <span class="hljs-keyword">max</span>Letters = <span class="hljs-number">2</span>, <span class="hljs-keyword">min</span>Size = <span class="hljs-number">3</span>, <span class="hljs-keyword">max</span>Size = <span class="hljs-number">3</span><br>输出：<span class="hljs-number">0</span><br></code></pre></td></tr></table></figure>
 <p><strong>提示：</strong></p>
 <ul>
-<li><code>1 &lt;= word.length &lt;= 10^5</code></li>
-<li><code>word</code> 只包含小写英文字母。</li>
-<li><code>1 &lt;= k &lt;= word.length</code></li>
+<li><code>1 &lt;= s.length &lt;= 10^5</code></li>
+<li><code>1 &lt;= maxLetters &lt;= 26</code></li>
+<li><code>1 &lt;= minSize &lt;= maxSize &lt;= min(26, s.length)</code></li>
+<li><code>s</code> 只包含小写英文字母。</li>
 </ul>
 <h2 id="题解">2 题解</h2>
 <h3 id="滑动窗口">2.1 滑动窗口</h3>
 <p><strong>思路：</strong></p>
-<p>先根据相邻字符相差不能超过2的性质，找出所有可能成为答案的子字符串。这里需要O(n)。</p>
-<p>对每一个子字符串，进行枚举，假设出现了1种字符、2种字符...26种字符，每个字符都需要k个字母。所以我们就可以转换为定长的滑动窗口问题。这里需要O(26n)。</p>
-<p><strong>时间复杂度：</strong>最终是O(n)</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">countCompleteSubstrings</span><span class="hljs-params">(string word, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = word.<span class="hljs-built_in">size</span>(), ans = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> left = <span class="hljs-number">0</span>; left &lt; n; left++) &#123; <span class="hljs-comment">// 枚举左端点</span><br>            <span class="hljs-type">int</span> right = left + <span class="hljs-number">1</span>; <span class="hljs-comment">// 右端点，起码要两个元素，所以是左端点的下一个元素。</span><br><br>            <span class="hljs-keyword">while</span> (right &lt; n &amp;&amp; <span class="hljs-built_in">abs</span>(word[right] - word[right - <span class="hljs-number">1</span>]) &lt;= <span class="hljs-number">2</span>) <span class="hljs-comment">// 尽可能的移动右端点，得到的结果是[left, right)</span><br>                right++;<br>            ans = ans + <span class="hljs-built_in">calAns</span>(word.<span class="hljs-built_in">substr</span>(left, right - left), k);<br>            left = right - <span class="hljs-number">1</span>;<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">calAns</span><span class="hljs-params">(string word, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = word.<span class="hljs-built_in">size</span>(), res = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">26</span> &amp;&amp; n &gt;= i * k; i++) &#123; <span class="hljs-comment">// 枚举可能出现的字符数量。定长动态窗口问题，长度为i * k。</span><br>            <span class="hljs-type">int</span> left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>, memo[<span class="hljs-number">26</span>] = &#123;<span class="hljs-number">0</span>&#125;; <span class="hljs-comment">// 右端点和左端点可以从一处出发。</span><br><br>            <span class="hljs-keyword">while</span> (right &lt; i * k) <span class="hljs-comment">// 构建初始的滑动窗口,结束的时候，右指针指向的内容还没有记录。</span><br>                memo[word[right++] - <span class="hljs-string">&#x27;a&#x27;</span>]++;<br>            res = res + <span class="hljs-built_in">check</span>(memo, k); <span class="hljs-comment">// 计算一次答案。</span><br>            <span class="hljs-keyword">while</span> (right &lt; n) &#123;<br>                memo[word[left++] - <span class="hljs-string">&#x27;a&#x27;</span>]--;<br>                memo[word[right++] - <span class="hljs-string">&#x27;a&#x27;</span>]++;<br>                res = res + <span class="hljs-built_in">check</span>(memo, k);<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">bool</span> <span class="hljs-title">check</span><span class="hljs-params">(<span class="hljs-type">int</span> array[], <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">26</span>; i++)<br>            <span class="hljs-keyword">if</span> (array[i] &gt; <span class="hljs-number">0</span> &amp;&amp; array[i] != k)<br>                <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
-<h3 id="滑动窗口优化">2.2 滑动窗口+优化</h3>
-<p><strong>思路：</strong></p>
-<p>在2.1的基础上，不用check函数，而是使用一个哈希表，记录出现&lt;出现次数，字符种类&gt;的哈希表。这样检测是否满足条件，只要检查定长滑动窗口的情况下，<code>map[k] == i</code>
-即可。</p>
+<p>枚举长度为[minSize,
+maxSize]的滑动窗口，判断这些滑动窗口中的子字符串是否满足要求，满足就记录到哈希表中，分别使用一个string以及一个int记录出现次数最多的子字符串和出现次数。</p>
+<p>但是进一步来说，我们只要进行长度为minSize的滑动窗口计算即可，长度更短的滑动窗口的答案一定是大于等于长度更长的滑动窗口的答案。因为长字符串出现了beta次时，短字符串也一定出现了beta次，但短字符串可能会有更多。</p>
 <p><strong>时间复杂度：</strong>O(n)</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">countCompleteSubstrings</span><span class="hljs-params">(string word, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = word.<span class="hljs-built_in">size</span>(), ans = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> left = <span class="hljs-number">0</span>; left &lt; n; left++) &#123; <span class="hljs-comment">// 枚举左端点</span><br>            <span class="hljs-type">int</span> right = left + <span class="hljs-number">1</span>; <span class="hljs-comment">// 右端点，起码要两个元素，所以是左端点的下一个元素。</span><br><br>            <span class="hljs-keyword">while</span> (right &lt; n &amp;&amp; <span class="hljs-built_in">abs</span>(word[right] - word[right - <span class="hljs-number">1</span>]) &lt;= <span class="hljs-number">2</span>) <span class="hljs-comment">// 尽可能的移动右端点，得到的结果是[left, right)</span><br>                right++;<br>            ans = ans + <span class="hljs-built_in">calAns</span>(word.<span class="hljs-built_in">substr</span>(left, right - left), k);<br>            left = right - <span class="hljs-number">1</span>;<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br><br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">calAns</span><span class="hljs-params">(string word, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> n = word.<span class="hljs-built_in">size</span>(), res = <span class="hljs-number">0</span>;<br>        unordered_map&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt; map; <span class="hljs-comment">// 记录&lt;出现次数, 字符种类数&gt;</span><br><br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= <span class="hljs-number">26</span> &amp;&amp; n &gt;= i * k; i++) &#123; <span class="hljs-comment">// 枚举可能出现的字符数量。定长动态窗口问题，长度为i * k。</span><br>            <span class="hljs-type">int</span> left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>, memo[<span class="hljs-number">26</span>] = &#123;<span class="hljs-number">0</span>&#125;; <span class="hljs-comment">// 右端点和左端点可以从一处出发。</span><br><br>            <span class="hljs-keyword">while</span> (right &lt; i * k) &#123; <span class="hljs-comment">// 构建初始的滑动窗口,结束的时候，右指针指向的内容还没有记录。</span><br>                memo[word[right] - <span class="hljs-string">&#x27;a&#x27;</span>]++;<br>                map[memo[word[right] - <span class="hljs-string">&#x27;a&#x27;</span>]]++;<br>                right++;<br>            &#125;<br>            res = res + (map[k] == i); <span class="hljs-comment">// 计算一次答案。</span><br>            <span class="hljs-keyword">while</span> (right &lt; n) &#123;<br>                map[memo[word[left] - <span class="hljs-string">&#x27;a&#x27;</span>]]--;<br>                memo[word[left] - <span class="hljs-string">&#x27;a&#x27;</span>]--;<br>                memo[word[right] - <span class="hljs-string">&#x27;a&#x27;</span>]++;<br>                map[memo[word[right] - <span class="hljs-string">&#x27;a&#x27;</span>]]++;<br>                left++;<br>                right++;<br>                res = res + (map[k] == i); <span class="hljs-comment">// 计算一次答案。</span><br>            &#125;<br>            map.<span class="hljs-built_in">clear</span>();<br>        &#125;<br>        <span class="hljs-keyword">return</span> res;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">maxFreq</span><span class="hljs-params">(string s, <span class="hljs-type">int</span> maxLetters, <span class="hljs-type">int</span> minSize, <span class="hljs-type">int</span> maxSize)</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-built_in">freqForK</span>(s, maxLetters, minSize);<br>    &#125;<br><br>    <span class="hljs-comment">// 计算固定长度为k的时候，满足条件的答案数量。</span><br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">freqForK</span><span class="hljs-params">(string s, <span class="hljs-type">int</span> maxLetters, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>, n = s.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-type">int</span> alpha[<span class="hljs-number">26</span>] = &#123;<span class="hljs-number">0</span>&#125;, count = <span class="hljs-number">0</span>; <span class="hljs-comment">// 字符出出现的次数，出现了多少种字符</span><br>        unordered_map&lt;string, <span class="hljs-type">int</span>&gt; map; <span class="hljs-comment">// 记录&lt;符合要求的子串, 出现次数&gt;</span><br>        string maxString = <span class="hljs-string">&quot;&quot;</span>;<br>        <span class="hljs-type">int</span> maxStringCount = <span class="hljs-number">0</span>; <span class="hljs-comment">// 只记录出现次数最多的的字符串以及出现次数。</span><br>        <br>        <span class="hljs-keyword">while</span> (right &lt; k) &#123; <span class="hljs-comment">// 构造初始窗口</span><br>            count = count + (alpha[s[right] - <span class="hljs-string">&#x27;a&#x27;</span>] == <span class="hljs-number">0</span>);<br>            alpha[s[right++] - <span class="hljs-string">&#x27;a&#x27;</span>]++;<br>        &#125;<br>        <span class="hljs-keyword">if</span> (count &lt;= maxLetters) &#123; <span class="hljs-comment">// 如果符合条件，记录满足条件的子串以及出现的次数。</span><br>            maxString = s.<span class="hljs-built_in">substr</span>(left, right - left);<br>            maxStringCount = <span class="hljs-number">1</span>;<br>            map[maxString] = maxStringCount;<br>        &#125;<br>        <span class="hljs-keyword">while</span> (right &lt; n) &#123; <span class="hljs-comment">// 读入-弹出-计算答案</span><br>            count = count - (alpha[s[left] - <span class="hljs-string">&#x27;a&#x27;</span>] == <span class="hljs-number">1</span>);<br>            alpha[s[left++] - <span class="hljs-string">&#x27;a&#x27;</span>]--;<br>            count = count + (alpha[s[right] - <span class="hljs-string">&#x27;a&#x27;</span>] == <span class="hljs-number">0</span>);<br>            alpha[s[right++] - <span class="hljs-string">&#x27;a&#x27;</span>]++;<br>            <span class="hljs-keyword">if</span> (count &lt;= maxLetters) &#123;<br>                string tmpStr = s.<span class="hljs-built_in">substr</span>(left, right - left);<br>                map[tmpStr]++;<br>                <span class="hljs-keyword">if</span> (map[tmpStr] &gt; maxStringCount) &#123;<br>                    maxStringCount = map[tmpStr];<br>                    maxString = tmpStr;<br>                &#125;<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> maxStringCount;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
                 
               </div>
@@ -394,8 +386,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Leetcode-count-complete-substring</div>
-      <div>https://astronaut-diode.github.io/2024/10/01/Leetcode-count-complete-substring/</div>
+      <div>Leetcode-maximum-number-of-occurrences-of-a-substring</div>
+      <div>https://astronaut-diode.github.io/2024/10/02/Leetcode-maximum-number-of-occurrences-of-a-substring/</div>
     </div>
     <div class="license-meta">
       
@@ -407,7 +399,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年10月1日</div>
+          <div>2024年10月2日</div>
         </div>
       
       
@@ -439,9 +431,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/10/01/Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length/" title="Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length">
+                      <a href="/2024/10/02/Leetcode-sliding-subarray-beauty/" title="Leetcode-sliding-subarray-beauty">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length</span>
+                        <span class="hidden-mobile">Leetcode-sliding-subarray-beauty</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -449,8 +441,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/10/01/Leetcode-longest-even-odd-subarray-with-threshold/" title="Leetcode-longest-even-odd-subarray-with-threshold">
-                        <span class="hidden-mobile">Leetcode-longest-even-odd-subarray-with-threshold</span>
+                      <a href="/2024/10/02/Leetcode-maximum-points-you-can-obtain-from-cards/" title="Leetcode-maximum-points-you-can-obtain-from-cards">
+                        <span class="hidden-mobile">Leetcode-maximum-points-you-can-obtain-from-cards</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -540,7 +532,7 @@
       
         <a href="/2024/10/01/Leetcode-count-complete-substring/" title="Leetcode-count-complete-substring"
            class="list-group-item list-group-item-action
-           active">
+           ">
           <span class="category-post">Leetcode-count-complete-substring</span>
         </a>
       
@@ -594,7 +586,7 @@
       
         <a href="/2024/10/02/Leetcode-maximum-number-of-occurrences-of-a-substring/" title="Leetcode-maximum-number-of-occurrences-of-a-substring"
            class="list-group-item list-group-item-action
-           ">
+           active">
           <span class="category-post">Leetcode-maximum-number-of-occurrences-of-a-substring</span>
         </a>
       
