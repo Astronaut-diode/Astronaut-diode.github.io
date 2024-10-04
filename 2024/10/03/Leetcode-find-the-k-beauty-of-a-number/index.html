@@ -19,15 +19,15 @@
   <meta name="author" content="锋">
   <meta name="keywords" content="">
   
-    <meta name="description" content="给定数组，找出所有定长为k且至少包含m种数字的子数组，求出这些子数组中最大和是多少。">
+    <meta name="description" content="给定一个数字num，并给定k，求出k中有多少个长度k的子字符串，可以实现num % 子字符串 &#x3D; 0">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Leetcode-maximum-sum-of-almost-unique-subarray">
-<meta property="og:url" content="https://astronaut-diode.github.io/2024/10/02/Leetcode-maximum-sum-of-almost-unique-subarray/index.html">
+<meta property="og:title" content="Leetcode-find-the-k-beauty-of-a-number">
+<meta property="og:url" content="https://astronaut-diode.github.io/2024/10/03/Leetcode-find-the-k-beauty-of-a-number/index.html">
 <meta property="og:site_name" content="锋的博客">
-<meta property="og:description" content="给定数组，找出所有定长为k且至少包含m种数字的子数组，求出这些子数组中最大和是多少。">
+<meta property="og:description" content="给定一个数字num，并给定k，求出k中有多少个长度k的子字符串，可以实现num % 子字符串 &#x3D; 0">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-10-02T03:19:50.000Z">
-<meta property="article:modified_time" content="2024-10-02T03:28:22.785Z">
+<meta property="article:published_time" content="2024-10-03T05:27:52.000Z">
+<meta property="article:modified_time" content="2024-10-03T05:52:14.769Z">
 <meta property="article:author" content="锋">
 <meta property="article:tag" content="Leetcode">
 <meta property="article:tag" content="滑动窗口">
@@ -35,7 +35,7 @@
   
   
   
-  <title>Leetcode-maximum-sum-of-almost-unique-subarray - 锋的博客</title>
+  <title>Leetcode-find-the-k-beauty-of-a-number - 锋的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -201,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Leetcode-maximum-sum-of-almost-unique-subarray"></span>
+            <span id="subtitle" data-typed-text="Leetcode-find-the-k-beauty-of-a-number"></span>
           
         </div>
 
@@ -217,8 +217,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-10-02 11:19" pubdate>
-          星期三, 十月 2日 2024, 11:19 上午
+        <time datetime="2024-10-03 13:27" pubdate>
+          星期四, 十月 3日 2024, 1:27 下午
         </time>
       </span>
     
@@ -230,7 +230,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          763 字
+          494 字
         
       </span>
     
@@ -242,7 +242,7 @@
         
         
           <!-- compatible with older versions-->
-          7 分钟
+          5 分钟
         
       </span>
     
@@ -296,46 +296,44 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Leetcode-maximum-sum-of-almost-unique-subarray</h1>
+            <h1 id="seo-header">Leetcode-find-the-k-beauty-of-a-number</h1>
             
             
               <div class="markdown-body">
                 
                 <h2 id="题目描述">1 题目描述</h2>
-<p>给你一个整数数组 <code>nums</code> 和两个正整数 <code>m</code> 和
-<code>k</code> 。</p>
-<p>请你返回 <code>nums</code> 中长度为 <code>k</code> 的
-<strong>几乎唯一</strong> 子数组的 <strong>最大和</strong>
-，如果不存在几乎唯一子数组，请你返回 <code>0</code> 。</p>
-<p>如果 <code>nums</code> 的一个子数组有至少 <code>m</code>
-个互不相同的元素，我们称它是 <strong>几乎唯一</strong> 子数组。</p>
-<p>子数组指的是一个数组中一段连续 <strong>非空</strong> 的元素序列。</p>
+<p>一个整数 <code>num</code> 的 <strong>k</strong> 美丽值定义为
+<code>num</code> 中符合以下条件的 <strong>子字符串</strong> 数目：</p>
+<ul>
+<li>子字符串长度为 <code>k</code> 。</li>
+<li>子字符串能整除 <code>num</code> 。</li>
+</ul>
+<p>给你整数 <code>num</code> 和 <code>k</code> ，请你返回
+<code>num</code> 的 k 美丽值。</p>
+<p>注意：</p>
+<ul>
+<li>允许有 <strong>前缀</strong> <strong>0</strong> 。</li>
+<li><code>0</code> 不能整除任何值。</li>
+</ul>
+<p>一个 <strong>子字符串</strong> 是一个字符串里的连续一段字符序列。</p>
 <p><strong>示例 1：</strong></p>
-<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs accesslog">输入：nums = <span class="hljs-string">[2,6,7,3,1,7]</span>, m = <span class="hljs-number">3</span>, k = <span class="hljs-number">4</span><br>输出：<span class="hljs-number">18</span><br>解释：总共有 <span class="hljs-number">3</span> 个长度为 k = <span class="hljs-number">4</span> 的几乎唯一子数组。分别为 <span class="hljs-string">[2, 6, 7, 3]</span> ，<span class="hljs-string">[6, 7, 3, 1]</span> 和 <span class="hljs-string">[7, 3, 1, 7]</span> 。这些子数组中，和最大的是 <span class="hljs-string">[2, 6, 7, 3]</span> ，和为 <span class="hljs-number">18</span> 。<br></code></pre></td></tr></table></figure>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs dart">输入：<span class="hljs-built_in">num</span> = <span class="hljs-number">240</span>, k = <span class="hljs-number">2</span><br>输出：<span class="hljs-number">2</span><br>解释：以下是 <span class="hljs-built_in">num</span> 里长度为 k 的子字符串：<br>- <span class="hljs-string">&quot;240&quot;</span> 中的 <span class="hljs-string">&quot;24&quot;</span> ：<span class="hljs-number">24</span> 能整除 <span class="hljs-number">240</span> 。<br>- <span class="hljs-string">&quot;240&quot;</span> 中的 <span class="hljs-string">&quot;40&quot;</span> ：<span class="hljs-number">40</span> 能整除 <span class="hljs-number">240</span> 。<br>所以，k 美丽值为 <span class="hljs-number">2</span> 。<br></code></pre></td></tr></table></figure>
 <p><strong>示例 2：</strong></p>
-<figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs inform7">输入：nums = <span class="hljs-comment">[5,9,9,2,4,5,4]</span>, m = 1, k = 3<br>输出：23<br>解释：总共有 5 个长度为 k = 3 的几乎唯一子数组。分别为 <span class="hljs-comment">[5, 9, 9]</span> ，<span class="hljs-comment">[9, 9, 2]</span> ，<span class="hljs-comment">[9, 2, 4]</span> ，<span class="hljs-comment">[2, 4, 5]</span> 和 <span class="hljs-comment">[4, 5, 4]</span> 。这些子数组中，和最大的是 <span class="hljs-comment">[5, 9, 9]</span> ，和为 23 。<br></code></pre></td></tr></table></figure>
-<p><strong>示例 3：</strong></p>
-<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs tap">输入：nums = [1,2,1,2,1,2,1], m = 3, k = 3<br>输出：0<br>解释：输入数组中不存在长度为 k =<span class="hljs-number"> 3 </span>的子数组含有至少  m =<span class="hljs-number"> 3 </span>个互不相同元素的子数组。所以不存在几乎唯一子数组，最大和为<span class="hljs-number"> 0 </span>。<br></code></pre></td></tr></table></figure>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs dart">输入：<span class="hljs-built_in">num</span> = <span class="hljs-number">430043</span>, k = <span class="hljs-number">2</span><br>输出：<span class="hljs-number">2</span><br>解释：以下是 <span class="hljs-built_in">num</span> 里长度为 k 的子字符串：<br>- <span class="hljs-string">&quot;430043&quot;</span> 中的 <span class="hljs-string">&quot;43&quot;</span> ：<span class="hljs-number">43</span> 能整除 <span class="hljs-number">430043</span> 。<br>- <span class="hljs-string">&quot;430043&quot;</span> 中的 <span class="hljs-string">&quot;30&quot;</span> ：<span class="hljs-number">30</span> 不能整除 <span class="hljs-number">430043</span> 。<br>- <span class="hljs-string">&quot;430043&quot;</span> 中的 <span class="hljs-string">&quot;00&quot;</span> ：<span class="hljs-number">0</span> 不能整除 <span class="hljs-number">430043</span> 。<br>- <span class="hljs-string">&quot;430043&quot;</span> 中的 <span class="hljs-string">&quot;04&quot;</span> ：<span class="hljs-number">4</span> 不能整除 <span class="hljs-number">430043</span> 。<br>- <span class="hljs-string">&quot;430043&quot;</span> 中的 <span class="hljs-string">&quot;43&quot;</span> ：<span class="hljs-number">43</span> 能整除 <span class="hljs-number">430043</span> 。<br>所以，k 美丽值为 <span class="hljs-number">2</span> 。<br></code></pre></td></tr></table></figure>
 <p><strong>提示：</strong></p>
 <ul>
-<li><code>1 &lt;= nums.length &lt;= 2 * 10^4</code></li>
-<li><code>1 &lt;= m &lt;= k &lt;= nums.length</code></li>
-<li><code>1 &lt;= nums[i] &lt;= 10^9</code></li>
+<li><code>1 &lt;= num &lt;= 10^9</code></li>
+<li><code>1 &lt;= k &lt;= num.length</code> （将 <code>num</code>
+视为字符串）</li>
 </ul>
 <h2 id="题解">2 题解</h2>
 <h3 id="滑动窗口">2.1 滑动窗口</h3>
 <p><strong>思路：</strong></p>
-<p>使用sum记录滑动窗口的总和，map记录每种数字的出现次数，count记录有多少种数字。</p>
-<p>先构造初始的窗口并计算答案，之后重复</p>
-<ul>
-<li>读入</li>
-<li>弹出</li>
-<li>计算答案</li>
-</ul>
-<p>但是需要注意的是，读入弹出的过程最好是一步步来。如果left和right指向的元素是同一个时，使用map直接判断个数，容易出错。比如下面的代码：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c++">count = count - (map[nums[left]] == <span class="hljs-number">1</span>) + (map[nums[right]] == <span class="hljs-number">0</span>); <span class="hljs-comment">// 当nums[left] === nums[right]时，并且map[nums[left]] = 1时，就会存在问题，count会被归零。</span><br></code></pre></td></tr></table></figure>
+<p>主要点就是创建初始滑动窗口还有滑动的时候如何快速复用上一轮的结果。因为是数组，并且要去除最后一个数字，往前头加上一个数字，所以我们需要一个变量记录(10
+^ (k - 1))，滑动的时候，只需要整除10，再加上新数字 * (10 ^ (k -
+1))。</p>
 <p><strong>时间复杂度：</strong>O(n)</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">long</span> <span class="hljs-type">long</span> <span class="hljs-title">maxSum</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> m, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        unordered_map&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt; map; <span class="hljs-comment">// 记录&lt;数字，出现次数&gt;</span><br>        <span class="hljs-type">int</span> count = <span class="hljs-number">0</span>; <span class="hljs-comment">// 已经存在多少种数字，因为map中可能会存在出现次数为0的情况，erase太麻烦了，直接用count记录更佳。</span><br>        <span class="hljs-type">long</span> <span class="hljs-type">long</span> ans = <span class="hljs-number">0</span>, sum = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>, n = nums.<span class="hljs-built_in">size</span>();<br>        <span class="hljs-keyword">while</span> (right &lt; k) &#123; <span class="hljs-comment">// 构造基础滑动窗口</span><br>            count = count + (map[nums[right]] == <span class="hljs-number">0</span>);<br>            sum = sum + nums[right];<br>            map[nums[right++]]++;<br>        &#125;<br>        <span class="hljs-keyword">if</span> (count &gt;= m) &#123; <span class="hljs-comment">// 计算答案</span><br>            ans = sum;;<br>        &#125;<br>        <span class="hljs-keyword">while</span> (right &lt; n) &#123;<br>            count = count - (map[nums[left]] == <span class="hljs-number">1</span>); <span class="hljs-comment">// 这部分的内容需要分两步走，因为nums[left]和nums[right]可能相同，每一次使用map[nums[xx]]判定是否等于0或1，就已经假定变化了。</span><br>            map[nums[left]]--;<br>            count = count + (map[nums[right]] == <span class="hljs-number">0</span>); <span class="hljs-comment">// 更新滑动窗口中的数值种类</span><br>            map[nums[right]]++; <span class="hljs-comment">// 更新每种数字的个数</span><br>        <br>            sum = sum - nums[left] + nums[right]; <span class="hljs-comment">// 更新滑动窗口的总和</span><br>            left++;<br>            right++;<br>            <span class="hljs-keyword">if</span> (count &gt;= m) &#123;<br>                ans = <span class="hljs-built_in">max</span>(ans, sum);<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">divisorSubstrings</span><span class="hljs-params">(<span class="hljs-type">int</span> num, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> power = <span class="hljs-number">10</span>, pPower = <span class="hljs-number">1</span>, ans = <span class="hljs-number">0</span>, origin = num;<br>        <span class="hljs-type">long</span> <span class="hljs-type">long</span> sum = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">while</span> (right &lt; k) &#123; <span class="hljs-comment">// 构建初始窗口</span><br>            sum = sum + num % <span class="hljs-number">10</span> * pPower;<br>            num = num / <span class="hljs-number">10</span>;<br>            right++;<br>            <span class="hljs-keyword">if</span> (right &lt; k) <span class="hljs-comment">// 最后一轮的时候，不再计算</span><br>                pPower = pPower * power;<br>        &#125;<br>        <span class="hljs-keyword">if</span> (sum != <span class="hljs-number">0</span> &amp;&amp; origin % sum == <span class="hljs-number">0</span>) <span class="hljs-comment">// 计算答案</span><br>            ans++;<br>        <span class="hljs-keyword">while</span> (num != <span class="hljs-number">0</span>) &#123; <span class="hljs-comment">// 重复滑动窗口</span><br>            sum = sum / <span class="hljs-number">10</span> + num % <span class="hljs-number">10</span> * pPower;<br>            num = num / <span class="hljs-number">10</span>;<br>            <span class="hljs-keyword">if</span> (sum != <span class="hljs-number">0</span> &amp;&amp; origin % sum == <span class="hljs-number">0</span>) <span class="hljs-comment">// 计算答案</span><br>                ans++;<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
 
                 
               </div>
@@ -390,8 +388,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Leetcode-maximum-sum-of-almost-unique-subarray</div>
-      <div>https://astronaut-diode.github.io/2024/10/02/Leetcode-maximum-sum-of-almost-unique-subarray/</div>
+      <div>Leetcode-find-the-k-beauty-of-a-number</div>
+      <div>https://astronaut-diode.github.io/2024/10/03/Leetcode-find-the-k-beauty-of-a-number/</div>
     </div>
     <div class="license-meta">
       
@@ -403,7 +401,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年10月2日</div>
+          <div>2024年10月3日</div>
         </div>
       
       
@@ -435,9 +433,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/10/02/Leetcode-maximum-points-you-can-obtain-from-cards/" title="Leetcode-maximum-points-you-can-obtain-from-cards">
+                      <a href="/2024/10/04/Leetcode-contains-duplicate-iii/" title="Leetcode-contains-duplicate-iii">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Leetcode-maximum-points-you-can-obtain-from-cards</span>
+                        <span class="hidden-mobile">Leetcode-contains-duplicate-iii</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -445,8 +443,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/10/02/Leetcode-grumpy-bookstore-owner/" title="Leetcode-grumpy-bookstore-owner">
-                        <span class="hidden-mobile">Leetcode-grumpy-bookstore-owner</span>
+                      <a href="/2024/10/03/%E4%B8%80%E4%BA%9B%E6%95%B0%E5%AD%A6%E6%80%A7%E8%B4%A8/" title="一些数学性质">
+                        <span class="hidden-mobile">一些数学性质</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -581,7 +579,7 @@
       
         <a href="/2024/10/03/Leetcode-find-the-k-beauty-of-a-number/" title="Leetcode-find-the-k-beauty-of-a-number"
            class="list-group-item list-group-item-action
-           ">
+           active">
           <span class="category-post">Leetcode-find-the-k-beauty-of-a-number</span>
         </a>
       
@@ -653,7 +651,7 @@
       
         <a href="/2024/10/02/Leetcode-maximum-sum-of-almost-unique-subarray/" title="Leetcode-maximum-sum-of-almost-unique-subarray"
            class="list-group-item list-group-item-action
-           active">
+           ">
           <span class="category-post">Leetcode-maximum-sum-of-almost-unique-subarray</span>
         </a>
       
