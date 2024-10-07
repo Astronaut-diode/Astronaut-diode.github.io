@@ -1,0 +1,1101 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/bg/favicon.png">
+  <link rel="icon" href="/img/bg/favicon.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="锋">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="给定字符串s，仅由a、b、c组成，每次只能从左边或者右边取走元素，要求每种元素都取出k个至少，提问需要多少次操作，如果无法完成目标返回-1。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Leetcode-take-k-of-each-character-from-left-and-right">
+<meta property="og:url" content="https://astronaut-diode.github.io/2024/10/05/Leetcode-take-k-of-each-character-from-left-and-right/index.html">
+<meta property="og:site_name" content="锋的博客">
+<meta property="og:description" content="给定字符串s，仅由a、b、c组成，每次只能从左边或者右边取走元素，要求每种元素都取出k个至少，提问需要多少次操作，如果无法完成目标返回-1。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-10-05T09:15:30.000Z">
+<meta property="article:modified_time" content="2024-10-05T09:20:15.141Z">
+<meta property="article:author" content="锋">
+<meta property="article:tag" content="Leetcode">
+<meta property="article:tag" content="滑动窗口">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>Leetcode-take-k-of-each-character-from-left-and-right - 锋的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"astronaut-diode.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"left","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>锋的博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bg/blog_banner_background.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Leetcode-take-k-of-each-character-from-left-and-right"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        锋
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-10-05 17:15" pubdate>
+          星期六, 十月 5日 2024, 5:15 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          624 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          6 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="padding-left: 2rem; margin-right: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Leetcode-take-k-of-each-character-from-left-and-right</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="题目描述">1 题目描述</h2>
+<p>给你一个由字符 <code>'a'</code>、<code>'b'</code>、<code>'c'</code>
+组成的字符串 <code>s</code> 和一个非负整数 <code>k</code>
+。每分钟，你可以选择取走 <code>s</code> <strong>最左侧</strong> 还是
+<strong>最右侧</strong> 的那个字符。</p>
+<p>你必须取走每种字符 <strong>至少</strong> <code>k</code>
+个，返回需要的 <strong>最少</strong> 分钟数；如果无法取到，则返回
+<code>-1</code> 。</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs 1c">输入：s <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;aabaaaacaabc&quot;</span><span class="hljs-punctuation">,</span> k <span class="hljs-punctuation">=</span> <span class="hljs-number">2</span><br>输出：<span class="hljs-number">8</span><br>解释：<br>从 s 的左侧取三个字符，现在共取到两个字符 &#x27;a&#x27; 、一个字符 &#x27;b&#x27; 。<br>从 s 的右侧取五个字符，现在共取到四个字符 &#x27;a&#x27; 、两个字符 &#x27;b&#x27; 和两个字符 &#x27;c&#x27; 。<br>共需要 <span class="hljs-number">3</span> <span class="hljs-punctuation">+</span> <span class="hljs-number">5</span> <span class="hljs-punctuation">=</span> <span class="hljs-number">8</span> 分钟。<br>可以证明需要的最少分钟数是 <span class="hljs-number">8</span> 。<br></code></pre></td></tr></table></figure>
+<p><strong>示例 2：</strong></p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs 1c">输入：s <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;a&quot;</span><span class="hljs-punctuation">,</span> k <span class="hljs-punctuation">=</span> <span class="hljs-number">1</span><br>输出：<span class="hljs-punctuation">-</span><span class="hljs-number">1</span><br>解释：无法取到一个字符 &#x27;b&#x27; 或者 &#x27;c&#x27;，所以返回 <span class="hljs-punctuation">-</span><span class="hljs-number">1</span> 。<br></code></pre></td></tr></table></figure>
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>1 &lt;= s.length &lt;= 10^5</code></li>
+<li><code>s</code> 仅由字母
+<code>'a'</code>、<code>'b'</code>、<code>'c'</code> 组成</li>
+<li><code>0 &lt;= k &lt;= s.length</code></li>
+</ul>
+<h2 id="题解">2 题解</h2>
+<h3 id="滑动窗口">2.1 滑动窗口</h3>
+<p><strong>思路：</strong></p>
+<p>先统计所有的字符分布情况，看看完全的字符串能否满足给出的任务，如果不行，返回-1.</p>
+<p>假设包含alphaArray数组，记录了abc的分布。如果可以完成任务，将题目转换为，从字符串中提取子字符串，a和b和c都应该被提取出alphaArray['a']
+- k，alphaArray['b'] - k，alphaArray['c'] -
+k个。这是至多提取个数，提取多了就无法完成任务了。</p>
+<p>而子字符串的目标要越长越好，这样操作的次数才会越来越少，更加贴合题目的要求。</p>
+<p><strong>时间复杂度：</strong>O(n)</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">takeCharacters</span><span class="hljs-params">(string s, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> alphaArray[<span class="hljs-number">100</span>] = &#123;&#125;;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> sSize = s.<span class="hljs-built_in">size</span>(), left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; sSize; i++) &#123; <span class="hljs-comment">// 统计所有的字符个数。</span><br>            alphaArray[s[i]]++;<br>        &#125;<br>        <span class="hljs-keyword">if</span> (alphaArray[<span class="hljs-string">&#x27;a&#x27;</span>] &lt; k || alphaArray[<span class="hljs-string">&#x27;b&#x27;</span>] &lt; k || alphaArray[<span class="hljs-string">&#x27;c&#x27;</span>] &lt; k) <span class="hljs-comment">// 先解决-1的答案。</span><br>            <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>; <br>        alphaArray[<span class="hljs-string">&#x27;a&#x27;</span>] = alphaArray[<span class="hljs-string">&#x27;a&#x27;</span>] - k;<br>        alphaArray[<span class="hljs-string">&#x27;b&#x27;</span>] = alphaArray[<span class="hljs-string">&#x27;b&#x27;</span>] - k;<br>        alphaArray[<span class="hljs-string">&#x27;c&#x27;</span>] = alphaArray[<span class="hljs-string">&#x27;c&#x27;</span>] - k;<br>        <span class="hljs-comment">// 将题目转换为从中间取，至多取alphaArray[&#x27;a&#x27;],alphaArray[&#x27;b&#x27;],alphaArray[&#x27;c&#x27;]个a,b,c，并且子数组要求最长。</span><br>        <span class="hljs-keyword">while</span> (right &lt; sSize) &#123; <span class="hljs-comment">// 枚举右指针</span><br>            alphaArray[s[right++]]--;<br>            <span class="hljs-keyword">while</span> (!(alphaArray[s[right - <span class="hljs-number">1</span>]] &gt;= <span class="hljs-number">0</span>)) <span class="hljs-comment">// 条件：至多只能用这么多个，不能用超了。</span><br>                alphaArray[s[left++]]++;<br>            ans = <span class="hljs-built_in">max</span>(ans, right - left); <span class="hljs-comment">// 答案要求越大越好，因为子数组越大，那么两边取走越少。</span><br>        &#125;<br>        <span class="hljs-keyword">return</span> sSize - ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/C/" class="category-chain-item">C++</a>
+  
+  
+    <span>></span>
+    
+  <a href="/categories/C/Question/" class="category-chain-item">Question</a>
+  
+  
+
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Leetcode/" class="print-no-link">#Leetcode</a>
+      
+        <a href="/tags/%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3/" class="print-no-link">#滑动窗口</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Leetcode-take-k-of-each-character-from-left-and-right</div>
+      <div>https://astronaut-diode.github.io/2024/10/05/Leetcode-take-k-of-each-character-from-left-and-right/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>锋</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年10月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/10/06/Leetcode-find-the-longest-equal-subarray/" title="Leetcode-find-the-longest-equal-subarray">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Leetcode-find-the-longest-equal-subarray</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/10/05/Leetcode-frequency-of-the-most-frequent-element/" title="Leetcode-frequency-of-the-most-frequent-element">
+                        <span class="hidden-mobile">Leetcode-frequency-of-the-most-frequent-element</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar category-bar" style="margin-left: -1rem">
+    
+
+
+
+
+
+<div class="category-list">
+  
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item 
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="C++"
+        id="heading-f6f87c9fdcf8b3c3f07f93f1ee8712c9" role="tab" data-toggle="collapse" href="#collapse-f6f87c9fdcf8b3c3f07f93f1ee8712c9"
+        aria-expanded="true"
+      >
+        C++
+        <span class="list-group-count">(34)</span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+      <div class="category-collapse collapse show" id="collapse-f6f87c9fdcf8b3c3f07f93f1ee8712c9"
+           role="tabpanel" aria-labelledby="heading-f6f87c9fdcf8b3c3f07f93f1ee8712c9">
+        
+        
+          
+          
+  <div class="category-post-list">
+    
+    
+  </div>
+
+          
+  
+    
+    
+    
+    <div class="category-sub row nomargin-x">
+      <a class="category-subitem 
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="Question"
+        id="heading-a97ea56b0e00b2379736ae60869ff66a" role="tab" data-toggle="collapse" href="#collapse-a97ea56b0e00b2379736ae60869ff66a"
+        aria-expanded="true"
+      >
+        Question
+        <span class="list-group-count">(33)</span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+      <div class="category-collapse collapse show" id="collapse-a97ea56b0e00b2379736ae60869ff66a"
+           role="tabpanel" aria-labelledby="heading-a97ea56b0e00b2379736ae60869ff66a">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/2024/10/05/Leetcide-maximize-the-confusion-of-an-exam/" title="Leetcide-maximize-the-confusion-of-an-exam"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcide-maximize-the-confusion-of-an-exam</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/01/Leetcode-3sum/" title="Leetcode-3sum"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-3sum</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/04/Leetcode-contains-duplicate-iii/" title="Leetcode-contains-duplicate-iii"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-contains-duplicate-iii</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/01/Leetcode-count-complete-substring/" title="Leetcode-count-complete-substring"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-count-complete-substring</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/02/Leetcode-defuse-the-bomb/" title="Leetcode-defuse-the-bomb"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-defuse-the-bomb</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/02/Leetcode-find-all-anagrams-in-a-string/" title="Leetcode-find-all-anagrams-in-a-string"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-find-all-anagrams-in-a-string</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/03/Leetcode-find-substring-with-given-hash-value/" title="Leetcode-find-substring-with-given-hash-value"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-find-substring-with-given-hash-value</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/03/Leetcode-find-the-k-beauty-of-a-number/" title="Leetcode-find-the-k-beauty-of-a-number"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-find-the-k-beauty-of-a-number</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/06/Leetcode-find-the-longest-equal-subarray/" title="Leetcode-find-the-longest-equal-subarray"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-find-the-longest-equal-subarray</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/05/Leetcode-find-the-longest-semi-repetitive-substring/" title="Leetcode-find-the-longest-semi-repetitive-substring"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-find-the-longest-semi-repetitive-substring</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/05/Leetcode-frequency-of-the-most-frequent-element/" title="Leetcode-frequency-of-the-most-frequent-element"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-frequency-of-the-most-frequent-element</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/05/Leetcode-fruit-into-baskets/" title="Leetcode-fruit-into-baskets"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-fruit-into-baskets</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/05/Leetcode-get-equal-substrings-within-budget/" title="Leetcode-get-equal-substrings-within-budget"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-get-equal-substrings-within-budget</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/02/Leetcode-grumpy-bookstore-owner/" title="Leetcode-grumpy-bookstore-owner"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-grumpy-bookstore-owner</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/01/Leetcode-k-radius-subarray-averages/" title="Leetcode-k-radius-subarray-averages"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-k-radius-subarray-averages</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/01/Leetcode-longest-even-odd-subarray-with-threshold/" title="Leetcode-longest-even-odd-subarray-with-threshold"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-longest-even-odd-subarray-with-threshold</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/05/Leetcode-longest-subarray-of-1s-after-deleting-one-element/" title="Leetcode-longest-subarray-of-1s-after-deleting-one-element"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-longest-subarray-of-1s-after-deleting-one-element</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/05/Leetcode-longest-substring-without-repeating-characters/" title="Leetcode-longest-substring-without-repeating-characters"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-longest-substring-without-repeating-characters</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/01/Leetcode-maximum-average-subarray-i/" title="Leetcode-maximum-average-subarray-i"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-maximum-average-subarray-i</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/05/Leetcode-maximum-beauty-of-an-array-after-applying-operation/" title="Leetcode-maximum-beauty-of-an-array-after-applying-operation"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-maximum-beauty-of-an-array-after-applying-operation</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/02/Leetcode-maximum-number-of-occurrences-of-a-substring/" title="Leetcode-maximum-number-of-occurrences-of-a-substring"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-maximum-number-of-occurrences-of-a-substring</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/01/Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length/" title="Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-maximum-number-of-vowels-in-a-substring-of-given-length</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/02/Leetcode-maximum-points-you-can-obtain-from-cards/" title="Leetcode-maximum-points-you-can-obtain-from-cards"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-maximum-points-you-can-obtain-from-cards</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/02/Leetcode-maximum-sum-of-almost-unique-subarray/" title="Leetcode-maximum-sum-of-almost-unique-subarray"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-maximum-sum-of-almost-unique-subarray</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/05/Leetcode-minimum-operations-to-reduce-x-to-zero/" title="Leetcode-minimum-operations-to-reduce-x-to-zero"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-minimum-operations-to-reduce-x-to-zero</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/01/Leetcode-minimum-recolors-to-get-k-consecutive-black-blocks/" title="Leetcode-minimum-recolors-to-get-k-consecutive-black-blocks"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-minimum-recolors-to-get-k-consecutive-black-blocks</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/02/Leetcode-minimum-swaps-to-group-all-1s-together-ii/" title="Leetcode-minimum-swaps-to-group-all-1s-together-ii"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-minimum-swaps-to-group-all-1s-together-ii</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/01/Leetcode-number-of-sub-arrays-of-size-k-and-average-greater-than-or-equal-to-threshold/" title="Leetcode-number-of-sub-arrays-of-size-k-and-average-greater-than-or-equal-to-threshold"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-number-of-sub-arrays-of-size-k-and-average-greater-than-or-equal-to-threshold</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/02/Leetcode-permutation-in-string/" title="Leetcode-permutation-in-string"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-permutation-in-string</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/02/Leetcode-sliding-subarray-beauty/" title="Leetcode-sliding-subarray-beauty"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-sliding-subarray-beauty</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/02/Leetcode-substring-with-concatenation-of-all-words-submissions/" title="Leetcode-substring-with-concatenation-of-all-words/submissions"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-substring-with-concatenation-of-all-words/submissions</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/05/Leetcode-take-k-of-each-character-from-left-and-right/" title="Leetcode-take-k-of-each-character-from-left-and-right"
+           class="list-group-item list-group-item-action
+           active">
+          <span class="category-post">Leetcode-take-k-of-each-character-from-left-and-right</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2024/10/01/Leetcode-two-sum/" title="Leetcode-two-sum"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">Leetcode-two-sum</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+    
+    
+    
+    <div class="category-sub row nomargin-x">
+      <a class="category-subitem collapsed
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="Usage"
+        id="heading-c64518704ce0c0d5501a45763f464276" role="tab" data-toggle="collapse" href="#collapse-c64518704ce0c0d5501a45763f464276"
+        aria-expanded="false"
+      >
+        Usage
+        <span class="list-group-count">(1)</span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+      <div class="category-collapse collapse " id="collapse-c64518704ce0c0d5501a45763f464276"
+           role="tabpanel" aria-labelledby="heading-c64518704ce0c0d5501a45763f464276">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/2024/09/29/C++%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" title="C++中的常见数据结构"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">C++中的常见数据结构</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+        
+      </div>
+    </div>
+  
+</div>
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

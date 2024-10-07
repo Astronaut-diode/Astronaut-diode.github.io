@@ -4,6 +4,325 @@
   
   
   <entry>
+    <title>Leetcode-find-the-longest-equal-subarray</title>
+    <link href="/2024/10/06/Leetcode-find-the-longest-equal-subarray/"/>
+    <url>/2024/10/06/Leetcode-find-the-longest-equal-subarray/</url>
+    
+    <content type="html"><![CDATA[<h2 id="题目描述">1 题目描述</h2><p>给你一个下标从 <strong>0</strong> 开始的整数数组 <code>nums</code>和一个整数 <code>k</code> 。</p><p>如果子数组中所有元素都相等，则认为子数组是一个<strong>等值子数组</strong> 。注意，空数组是 <strong>等值子数组</strong>。</p><p>从 <code>nums</code> 中删除最多 <code>k</code>个元素后，返回可能的最长等值子数组的长度。</p><p><strong>子数组</strong> 是数组中一个连续且可能为空的元素序列。</p><p><strong>示例 1：</strong></p><figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs tap">输入：nums = [1,3,2,3,1,3], k = 3<br>输出：3<br>解释：最优的方案是删除下标<span class="hljs-number"> 2 </span>和下标<span class="hljs-number"> 4 </span>的元素。<br>删除后，nums 等于 [1, 3, 3, 3] 。<br>最长等值子数组从 i =<span class="hljs-number"> 1 </span>开始到 j =<span class="hljs-number"> 3 </span>结束，长度等于<span class="hljs-number"> 3 </span>。<br>可以证明无法创建更长的等值子数组。<br></code></pre></td></tr></table></figure><p><strong>示例 2：</strong></p><figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs tap">输入：nums = [1,1,2,2,1,1], k = 2<br>输出：4<br>解释：最优的方案是删除下标<span class="hljs-number"> 2 </span>和下标<span class="hljs-number"> 3 </span>的元素。 <br>删除后，nums 等于 [1, 1, 1, 1] 。 <br>数组自身就是等值子数组，长度等于<span class="hljs-number"> 4 </span>。 <br>可以证明无法创建更长的等值子数组。<br></code></pre></td></tr></table></figure><p><strong>提示：</strong></p><ul><li><code>1 &lt;= nums.length &lt;= 10^5</code></li><li><code>1 &lt;= nums[i] &lt;= nums.length</code></li><li><code>0 &lt;= k &lt;= nums.length</code></li></ul><h2 id="题解">2 题解</h2><h3 id="滑动窗口">2.1 滑动窗口</h3><p><strong>思路：</strong></p><p>将所有相同的元素记录到同一个数组中，记录的内容是目标元素在原始数组中的下标。对该数组进行滑动窗口，假设当前的滑动窗口是<code>[left, right)</code>，那么总元素个数为<code>pos[num][right - 1] - pos[num][left] + 1</code>，包含目标数字的个数为<code>right - left</code>，所以就能构造出需要的条件<code>pos[num][right - 1] - pos[num][left] + 1 - (right - left) &lt;= k</code>。</p><p><strong>时间复杂度：</strong>O(n)</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">longestEqualSubarray</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> numsSize = nums.<span class="hljs-built_in">size</span>(), left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>;<br>        vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt; pos = vector&lt;vector&lt;<span class="hljs-type">int</span>&gt;&gt;(numsSize + <span class="hljs-number">1</span>); <span class="hljs-comment">// 将每种数字，保存其出现的所有位置。比如数字3，保存在[1,3,5]代表在原始的下标1、3、5的位置上的数字为3。</span><br>        <br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; numsSize; i++) &#123;<br>            pos[nums[i]].<span class="hljs-built_in">emplace_back</span>(i);<br>        &#125;<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; pos.<span class="hljs-built_in">size</span>(); i++) &#123; <span class="hljs-comment">// 对每一种数字进行滑动窗口操作。</span><br>            left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>;<br>            <span class="hljs-keyword">while</span> (right &lt; pos[i].<span class="hljs-built_in">size</span>()) &#123; <span class="hljs-comment">// 枚举右指针</span><br>                right++; <span class="hljs-comment">// 当前的范围是[left, right)</span><br>                <span class="hljs-keyword">while</span> (!(pos[i][right - <span class="hljs-number">1</span>] - pos[i][left] + <span class="hljs-number">1</span> - (right - left) &lt;= k)) <span class="hljs-comment">// 条件是：根据left和right取出在pos[i]中的数字，代表的是在原始数组中的下标。然后right和left记录的是两个相同的数字，所以这个数组中有多少个相同的数字可以直接通过right - left计算出来。</span><br>                    left++;                <br>                ans = <span class="hljs-built_in">max</span>(ans, right - left);<br>            &#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+      <category>Question</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Leetcode</tag>
+      
+      <tag>滑动窗口</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Leetcode-take-k-of-each-character-from-left-and-right</title>
+    <link href="/2024/10/05/Leetcode-take-k-of-each-character-from-left-and-right/"/>
+    <url>/2024/10/05/Leetcode-take-k-of-each-character-from-left-and-right/</url>
+    
+    <content type="html"><![CDATA[<h2 id="题目描述">1 题目描述</h2><p>给你一个由字符 <code>'a'</code>、<code>'b'</code>、<code>'c'</code>组成的字符串 <code>s</code> 和一个非负整数 <code>k</code>。每分钟，你可以选择取走 <code>s</code> <strong>最左侧</strong> 还是<strong>最右侧</strong> 的那个字符。</p><p>你必须取走每种字符 <strong>至少</strong> <code>k</code>个，返回需要的 <strong>最少</strong> 分钟数；如果无法取到，则返回<code>-1</code> 。</p><p><strong>示例 1：</strong></p><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs 1c">输入：s <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;aabaaaacaabc&quot;</span><span class="hljs-punctuation">,</span> k <span class="hljs-punctuation">=</span> <span class="hljs-number">2</span><br>输出：<span class="hljs-number">8</span><br>解释：<br>从 s 的左侧取三个字符，现在共取到两个字符 &#x27;a&#x27; 、一个字符 &#x27;b&#x27; 。<br>从 s 的右侧取五个字符，现在共取到四个字符 &#x27;a&#x27; 、两个字符 &#x27;b&#x27; 和两个字符 &#x27;c&#x27; 。<br>共需要 <span class="hljs-number">3</span> <span class="hljs-punctuation">+</span> <span class="hljs-number">5</span> <span class="hljs-punctuation">=</span> <span class="hljs-number">8</span> 分钟。<br>可以证明需要的最少分钟数是 <span class="hljs-number">8</span> 。<br></code></pre></td></tr></table></figure><p><strong>示例 2：</strong></p><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs 1c">输入：s <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;a&quot;</span><span class="hljs-punctuation">,</span> k <span class="hljs-punctuation">=</span> <span class="hljs-number">1</span><br>输出：<span class="hljs-punctuation">-</span><span class="hljs-number">1</span><br>解释：无法取到一个字符 &#x27;b&#x27; 或者 &#x27;c&#x27;，所以返回 <span class="hljs-punctuation">-</span><span class="hljs-number">1</span> 。<br></code></pre></td></tr></table></figure><p><strong>提示：</strong></p><ul><li><code>1 &lt;= s.length &lt;= 10^5</code></li><li><code>s</code> 仅由字母<code>'a'</code>、<code>'b'</code>、<code>'c'</code> 组成</li><li><code>0 &lt;= k &lt;= s.length</code></li></ul><h2 id="题解">2 题解</h2><h3 id="滑动窗口">2.1 滑动窗口</h3><p><strong>思路：</strong></p><p>先统计所有的字符分布情况，看看完全的字符串能否满足给出的任务，如果不行，返回-1.</p><p>假设包含alphaArray数组，记录了abc的分布。如果可以完成任务，将题目转换为，从字符串中提取子字符串，a和b和c都应该被提取出alphaArray['a']- k，alphaArray['b'] - k，alphaArray['c'] -k个。这是至多提取个数，提取多了就无法完成任务了。</p><p>而子字符串的目标要越长越好，这样操作的次数才会越来越少，更加贴合题目的要求。</p><p><strong>时间复杂度：</strong>O(n)</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">takeCharacters</span><span class="hljs-params">(string s, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> alphaArray[<span class="hljs-number">100</span>] = &#123;&#125;;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> sSize = s.<span class="hljs-built_in">size</span>(), left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; sSize; i++) &#123; <span class="hljs-comment">// 统计所有的字符个数。</span><br>            alphaArray[s[i]]++;<br>        &#125;<br>        <span class="hljs-keyword">if</span> (alphaArray[<span class="hljs-string">&#x27;a&#x27;</span>] &lt; k || alphaArray[<span class="hljs-string">&#x27;b&#x27;</span>] &lt; k || alphaArray[<span class="hljs-string">&#x27;c&#x27;</span>] &lt; k) <span class="hljs-comment">// 先解决-1的答案。</span><br>            <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>; <br>        alphaArray[<span class="hljs-string">&#x27;a&#x27;</span>] = alphaArray[<span class="hljs-string">&#x27;a&#x27;</span>] - k;<br>        alphaArray[<span class="hljs-string">&#x27;b&#x27;</span>] = alphaArray[<span class="hljs-string">&#x27;b&#x27;</span>] - k;<br>        alphaArray[<span class="hljs-string">&#x27;c&#x27;</span>] = alphaArray[<span class="hljs-string">&#x27;c&#x27;</span>] - k;<br>        <span class="hljs-comment">// 将题目转换为从中间取，至多取alphaArray[&#x27;a&#x27;],alphaArray[&#x27;b&#x27;],alphaArray[&#x27;c&#x27;]个a,b,c，并且子数组要求最长。</span><br>        <span class="hljs-keyword">while</span> (right &lt; sSize) &#123; <span class="hljs-comment">// 枚举右指针</span><br>            alphaArray[s[right++]]--;<br>            <span class="hljs-keyword">while</span> (!(alphaArray[s[right - <span class="hljs-number">1</span>]] &gt;= <span class="hljs-number">0</span>)) <span class="hljs-comment">// 条件：至多只能用这么多个，不能用超了。</span><br>                alphaArray[s[left++]]++;<br>            ans = <span class="hljs-built_in">max</span>(ans, right - left); <span class="hljs-comment">// 答案要求越大越好，因为子数组越大，那么两边取走越少。</span><br>        &#125;<br>        <span class="hljs-keyword">return</span> sSize - ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+      <category>Question</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Leetcode</tag>
+      
+      <tag>滑动窗口</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Leetcode-frequency-of-the-most-frequent-element</title>
+    <link href="/2024/10/05/Leetcode-frequency-of-the-most-frequent-element/"/>
+    <url>/2024/10/05/Leetcode-frequency-of-the-most-frequent-element/</url>
+    
+    <content type="html"><![CDATA[<h2 id="题目描述">1 题目描述</h2><p>元素的 <strong>频数</strong> 是该元素在一个数组中出现的次数。</p><p>给你一个整数数组 <code>nums</code> 和一个整数 <code>k</code>。在一步操作中，你可以选择 <code>nums</code>的一个下标，并将该下标对应元素的值增加 <code>1</code> 。</p><p>执行最多 <code>k</code> 次操作后，返回数组中最高频元素的<strong>最大可能频数</strong> <em>。</em></p><p><strong>示例 1：</strong></p><figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs tap">输入：nums = [1,2,4], k = 5<br>输出：3<br>解释：对第一个元素执行<span class="hljs-number"> 3 </span>次递增操作，对第二个元素执<span class="hljs-number"> 2 </span>次递增操作，此时 nums = [4,4,4] 。<br>4 是数组中最高频元素，频数是<span class="hljs-number"> 3 </span>。<br></code></pre></td></tr></table></figure><p><strong>示例 2：</strong></p><figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs tap">输入：nums = [1,4,8,13], k = 5<br>输出：2<br>解释：存在多种最优解决方案：<br>- 对第一个元素执行<span class="hljs-number"> 3 </span>次递增操作，此时 nums = [4,4,8,13] 。4 是数组中最高频元素，频数是<span class="hljs-number"> 2 </span>。<br>- 对第二个元素执行<span class="hljs-number"> 4 </span>次递增操作，此时 nums = [1,8,8,13] 。8 是数组中最高频元素，频数是<span class="hljs-number"> 2 </span>。<br>- 对第三个元素执行<span class="hljs-number"> 5 </span>次递增操作，此时 nums = [1,4,13,13] 。13 是数组中最高频元素，频数是<span class="hljs-number"> 2 </span>。<br></code></pre></td></tr></table></figure><p><strong>示例 3：</strong></p><figure class="highlight fix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs fix"><span class="hljs-attr">输入：nums </span>=<span class="hljs-string"> [3,9,6], k = 2</span><br><span class="hljs-string">输出：1</span><br></code></pre></td></tr></table></figure><p><strong>提示：</strong></p><ul><li><code>1 &lt;= nums.length &lt;= 10^5</code></li><li><code>1 &lt;= nums[i] &lt;= 10^5</code></li><li><code>1 &lt;= k &lt;= 10^5</code></li></ul><h2 id="题解">2 题解</h2><h3 id="滑动窗口">2.1 滑动窗口</h3><p><strong>思路：</strong></p><p>先排序，然后开辟滑动窗口，每次<strong>准备</strong>移动right时，从left到right的位置可以认为已经都是nums[right]了，所以可以很轻易的计算出，需要将left到right范围内的数字全部改变为nums[right]所需要的代价。</p><p>当right移动完毕以后，判断代价是否超标，只要超标了，收缩左指针，直到不再超标。</p><p>紧接着计算答案。</p><p>要点：中间有一处计算，可能会溢出，所以使用long long最好。</p><p><strong>时间复杂度：</strong>O(n)</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">maxFrequency</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-built_in">sort</span>(<span class="hljs-built_in">begin</span>(nums), <span class="hljs-built_in">end</span>(nums), [](<span class="hljs-type">int</span> &amp;challenger, <span class="hljs-type">int</span> &amp;challengee)&#123;<br>            <span class="hljs-keyword">return</span> challengee &gt; challenger; <span class="hljs-comment">// 升序排序</span><br>        &#125;);<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> numsSize = nums.<span class="hljs-built_in">size</span>(), left = <span class="hljs-number">0</span>, right = <span class="hljs-number">1</span>;<br>        ans = <span class="hljs-built_in">max</span>(ans, right - left); <span class="hljs-comment">// 答案默认是1。</span><br>        <span class="hljs-type">long</span> <span class="hljs-type">long</span> sum = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">while</span> (right &lt; numsSize) &#123; <span class="hljs-comment">// 枚举右端点</span><br>            sum = sum + (<span class="hljs-type">long</span> <span class="hljs-type">long</span>)(nums[right] - (nums[right - <span class="hljs-number">1</span>])) * (right - left);<br>            <span class="hljs-keyword">while</span> (!(sum &lt;= k)) <span class="hljs-comment">// 一直移动左端点，直到满足条件,条件就是使用的操作次数不允许操作k。</span><br>                sum = sum - (nums[right] - nums[left++]);<br>            right++;<br>            ans = <span class="hljs-built_in">max</span>(ans, right - left);<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+      <category>Question</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Leetcode</tag>
+      
+      <tag>滑动窗口</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Leetcode-minimum-operations-to-reduce-x-to-zero</title>
+    <link href="/2024/10/05/Leetcode-minimum-operations-to-reduce-x-to-zero/"/>
+    <url>/2024/10/05/Leetcode-minimum-operations-to-reduce-x-to-zero/</url>
+    
+    <content type="html"><![CDATA[<h2 id="题目描述">1 题目描述</h2><h2 id="题解">2 题解</h2><h3 id="题解-1">2.1 题解</h3><p><strong>思路：</strong></p><p>因为只能从左右抽数字，换个思路就是只会留下中间部分，那就是直接找一个子数组，剩下的内容满足条件即可。</p><p>而真正的目标是最小次数，所以子数组需要最长，且目标和等于总和-x。</p><p>需要注意的是，如果sum本身就小于x，那会导致新目标总和为负数，会出现问题，所以需要提前处理。</p><p><strong>时间复杂度：</strong>O(n)</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">minOperations</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> x)</span> </span>&#123;<br>        <span class="hljs-type">long</span> <span class="hljs-type">long</span> sum = <span class="hljs-built_in">accumulate</span>(<span class="hljs-built_in">begin</span>(nums), <span class="hljs-built_in">end</span>(nums), <span class="hljs-number">0</span>);<br>        <span class="hljs-keyword">if</span> (sum &lt; x) <span class="hljs-comment">// 如果总和都不够，那就返回-1。</span><br>            <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>        x = sum - x; <span class="hljs-comment">// 这是需要找的目标</span><br>        <span class="hljs-comment">// 题目转换为在nums中找到和为x的最长子数组</span><br>        <span class="hljs-type">int</span> numsSize = nums.<span class="hljs-built_in">size</span>(), left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">-1</span>;<br>        <span class="hljs-type">int</span> count = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">while</span> (right &lt; numsSize) &#123; <span class="hljs-comment">// 枚举右端点</span><br>            count = count + nums[right++];<br>            <span class="hljs-keyword">while</span> (!(count &lt;= x)) &#123; <span class="hljs-comment">// 只要和是不大于x的，都是符合条件的</span><br>                count = count - nums[left++];<br>            &#125;<br>            <span class="hljs-keyword">if</span> (count == x)<br>                ans = <span class="hljs-built_in">max</span>(ans, right - left);<br>        &#125;<br>        <span class="hljs-keyword">if</span> (ans == <span class="hljs-number">-1</span>)<br>            <span class="hljs-keyword">return</span> ans;<br>        <span class="hljs-keyword">else</span><br>            <span class="hljs-keyword">return</span> numsSize - ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+      <category>Question</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Leetcode</tag>
+      
+      <tag>滑动窗口</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Leetcide-maximize-the-confusion-of-an-exam</title>
+    <link href="/2024/10/05/Leetcide-maximize-the-confusion-of-an-exam/"/>
+    <url>/2024/10/05/Leetcide-maximize-the-confusion-of-an-exam/</url>
+    
+    <content type="html"><![CDATA[<h2 id="题目描述">1 题目描述</h2><p>一位老师正在出一场由 <code>n</code>道判断题构成的考试，每道题的答案为 true （用 <code>'T'</code> 表示）或者false （用 <code>'F'</code>表示）。老师想增加学生对自己做出答案的不确定性，方法是<strong>最大化</strong> 有 <strong>连续相同</strong>结果的题数。（也就是连续出现 true 或者连续出现 false）。</p><p>给你一个字符串 <code>answerKey</code> ，其中<code>answerKey[i]</code> 是第 <code>i</code>个问题的正确结果。除此以外，还给你一个整数 <code>k</code>，表示你能进行以下操作的最多次数：</p><ul><li>每次操作中，将问题的正确答案改为 <code>'T'</code> 或者<code>'F'</code> （也就是将 <code>answerKey[i]</code> 改为<code>'T'</code> 或者 <code>'F'</code> ）。</li></ul><p>请你返回在不超过 <code>k</code> 次操作的情况下，<strong>最大</strong>连续 <code>'T'</code> 或者 <code>'F'</code> 的数目。</p><p><strong>示例 1：</strong></p><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs 1c">输入：answerKey <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;TTFF&quot;</span><span class="hljs-punctuation">,</span> k <span class="hljs-punctuation">=</span> <span class="hljs-number">2</span><br>输出：<span class="hljs-number">4</span><br>解释：我们可以将两个 &#x27;F&#x27; 都变为 &#x27;T&#x27; ，得到 answerKey <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;TTTT&quot;</span> 。<br>总共有四个连续的 &#x27;T&#x27; 。<br></code></pre></td></tr></table></figure><p><strong>示例 2：</strong></p><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs 1c">输入：answerKey <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;TFFT&quot;</span><span class="hljs-punctuation">,</span> k <span class="hljs-punctuation">=</span> <span class="hljs-number">1</span><br>输出：<span class="hljs-number">3</span><br>解释：我们可以将最前面的 &#x27;T&#x27; 换成 &#x27;F&#x27; ，得到 answerKey <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;FFFT&quot;</span> 。<br>或者，我们可以将第二个 &#x27;T&#x27; 换成 &#x27;F&#x27; ，得到 answerKey <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;TFFF&quot;</span> 。<br>两种情况下，都有三个连续的 &#x27;F&#x27; 。<br></code></pre></td></tr></table></figure><p><strong>示例 3：</strong></p><figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs 1c">输入：answerKey <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;TTFTTFTT&quot;</span><span class="hljs-punctuation">,</span> k <span class="hljs-punctuation">=</span> <span class="hljs-number">1</span><br>输出：<span class="hljs-number">5</span><br>解释：我们可以将第一个 &#x27;F&#x27; 换成 &#x27;T&#x27; ，得到 answerKey <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;TTTTTFTT&quot;</span> 。<br>或者我们可以将第二个 &#x27;F&#x27; 换成 &#x27;T&#x27; ，得到 answerKey <span class="hljs-punctuation">=</span> <span class="hljs-string">&quot;TTFTTTTT&quot;</span> 。<br>两种情况下，都有五个连续的 &#x27;T&#x27; 。<br></code></pre></td></tr></table></figure><p><strong>提示：</strong></p><ul><li><code>n == answerKey.length</code></li><li><code>1 &lt;= n &lt;= 5 * 104</code></li><li><code>answerKey[i]</code> 要么是 <code>'T'</code> ，要么是<code>'F'</code></li><li><code>1 &lt;= k &lt;= n</code></li></ul><h2 id="题解">2 题解</h2><h3 id="滑动窗口">2.1 滑动窗口</h3><p><strong>思路：</strong></p><p>不定长度的话滑动窗口，主要点在于判断是否T和F的数量是否至少有一者小于等于k，只有满足这个条件，才能将其转换为全部相同的字符。</p><p><strong>时间复杂度:</strong>O(n)</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">maxConsecutiveAnswers</span><span class="hljs-params">(string answerKey, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> answerKeySize = answerKey.<span class="hljs-built_in">size</span>(), left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> memo[<span class="hljs-number">200</span>] = &#123;&#125;;<br><br>        <span class="hljs-keyword">while</span> (right &lt; answerKeySize) &#123; <span class="hljs-comment">// 枚举右指针</span><br>            memo[answerKey[right++]]++;<br>            <span class="hljs-keyword">while</span> (!(memo[<span class="hljs-string">&#x27;T&#x27;</span>] &lt;= k || memo[<span class="hljs-string">&#x27;F&#x27;</span>] &lt;= k)) &#123; <span class="hljs-comment">// 移动左指针，直到满足条件。题目的条件是T和F的数目至少有一种小于等于k，否则无法同化为连续相同。</span><br>                memo[answerKey[left++]]--;<br>            &#125;<br>            ans = <span class="hljs-built_in">max</span>(ans, right - left);<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+      <category>Question</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Leetcode</tag>
+      
+      <tag>滑动窗口</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Leetcode-maximum-beauty-of-an-array-after-applying-operation</title>
+    <link href="/2024/10/05/Leetcode-maximum-beauty-of-an-array-after-applying-operation/"/>
+    <url>/2024/10/05/Leetcode-maximum-beauty-of-an-array-after-applying-operation/</url>
+    
+    <content type="html"><![CDATA[<h2 id="题目描述">1 题目描述</h2><p>给你一个下标从 <strong>0</strong> 开始的整数数组 <code>nums</code>和一个 <strong>非负</strong> 整数 <code>k</code> 。</p><p>在一步操作中，你可以执行下述指令：</p><ul><li>在范围 <code>[0, nums.length - 1]</code> 中选择一个<strong>此前没有选过</strong> 的下标 <code>i</code> 。</li><li>将 <code>nums[i]</code> 替换为范围<code>[nums[i] - k, nums[i] + k]</code> 内的任一整数。</li></ul><p>数组的 <strong>美丽值</strong>定义为数组中由相等元素组成的最长子序列的长度。</p><p>对数组 <code>nums</code> 执行上述操作任意次后，返回数组可能取得的<strong>最大</strong> 美丽值。</p><p><strong>注意：</strong>你 <strong>只</strong> 能对每个下标执行<strong>一次</strong> 此操作。</p><p>数组的 <strong>子序列</strong>定义是：经由原数组删除一些元素（也可能不删除）得到的一个新数组，且在此过程中剩余元素的顺序不发生改变。</p><p><strong>示例 1：</strong></p><figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs inform7">输入：nums = <span class="hljs-comment">[4,6,1,2]</span>, k = 2<br>输出：3<br>解释：在这个示例中，我们执行下述操作：<br>- 选择下标 1 ，将其替换为 4（从范围 <span class="hljs-comment">[4,8]</span> 中选出），此时 nums = <span class="hljs-comment">[4,4,1,2]</span> 。<br>- 选择下标 3 ，将其替换为 4（从范围 <span class="hljs-comment">[0,4]</span> 中选出），此时 nums = <span class="hljs-comment">[4,4,1,4]</span> 。<br>执行上述操作后，数组的美丽值是 3（子序列由下标 0 、1 、3 对应的元素组成）。<br>可以证明 3 是我们可以得到的由相等元素组成的最长子序列长度。<br></code></pre></td></tr></table></figure><p><strong>示例 2：</strong></p><figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs dns">输入：nums = [<span class="hljs-number">1,1,1,1</span>], k = <span class="hljs-number">10</span><br>输出：<span class="hljs-number">4</span><br>解释：在这个示例中，我们无需执行任何操作。<br>数组 nums 的美丽值是 <span class="hljs-number">4</span>（整个数组）。<br></code></pre></td></tr></table></figure><p><strong>提示：</strong></p><ul><li><code>1 &lt;= nums.length &lt;= 10^5</code></li><li><code>0 &lt;= nums[i], k &lt;= 10^5</code></li></ul><h2 id="题解">2 题解</h2><h3 id="滑动窗口">2.1 滑动窗口</h3><p><strong>思路：</strong></p><p>先将数组进行升序排序，只要两个数字的差值小于等于2 *k，那就可以改变为相同的数字。所以在升序数组中，找到最大值和最小值差值不大于2* k的子数组即可，最长的子数组即为答案。</p><p><strong>时间复杂度：</strong>O(n)</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">maximumBeauty</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums, <span class="hljs-type">int</span> k)</span> </span>&#123;<br>        <span class="hljs-built_in">sort</span>(<span class="hljs-built_in">begin</span>(nums), <span class="hljs-built_in">end</span>(nums), [](<span class="hljs-type">int</span> &amp;challenger, <span class="hljs-type">int</span> &amp;challengee)&#123;<br>            <span class="hljs-keyword">return</span> challengee &gt; challenger; <span class="hljs-comment">// 按照升序排序。</span><br>        &#125;);<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> numsSize = nums.<span class="hljs-built_in">size</span>(), left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">while</span> (right &lt; numsSize) &#123; <span class="hljs-comment">// 枚举右端点</span><br>            right++;<br>            <span class="hljs-keyword">while</span> (!(<span class="hljs-built_in">abs</span>(nums[right - <span class="hljs-number">1</span>] - nums[left]) &lt;= <span class="hljs-number">2</span> * k)) &#123; <span class="hljs-comment">// 只要最大和最小数字的差值小于2k，都是满足条件的</span><br>                left++;<br>            &#125;<br>            ans = <span class="hljs-built_in">max</span>(ans, right - left);<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+      <category>Question</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Leetcode</tag>
+      
+      <tag>滑动窗口</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Leetcode-fruit-into-baskets</title>
+    <link href="/2024/10/05/Leetcode-fruit-into-baskets/"/>
+    <url>/2024/10/05/Leetcode-fruit-into-baskets/</url>
+    
+    <content type="html"><![CDATA[<h2 id="题目描述">1 题目描述</h2><p>你正在探访一家农场，农场从左到右种植了一排果树。这些树用一个整数数组<code>fruits</code> 表示，其中 <code>fruits[i]</code> 是第<code>i</code> 棵树上的水果 <strong>种类</strong> 。</p><p>你想要尽可能多地收集水果。然而，农场的主人设定了一些严格的规矩，你必须按照要求采摘水果：</p><ul><li>你只有 <strong>两个</strong> 篮子，并且每个篮子只能装<strong>单一类型</strong>的水果。每个篮子能够装的水果总量没有限制。</li><li>你可以选择任意一棵树开始采摘，你必须从 <strong>每棵</strong>树（包括开始采摘的树）上 <strong>恰好摘一个水果</strong>。采摘的水果应当符合篮子中的水果类型。每采摘一次，你将会向右移动到下一棵树，并继续采摘。</li><li>一旦你走到某棵树前，但水果不符合篮子的水果类型，那么就必须停止采摘。</li></ul><p>给你一个整数数组 <code>fruits</code> ，返回你可以收集的水果的<strong>最大</strong> 数目。</p><p><strong>示例 1：</strong></p><figure class="highlight fix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs fix"><span class="hljs-attr">输入：fruits </span>=<span class="hljs-string"> [1,2,1]</span><br><span class="hljs-string">输出：3</span><br><span class="hljs-string">解释：可以采摘全部 3 棵树。</span><br></code></pre></td></tr></table></figure><p><strong>示例 2：</strong></p><figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs inform7">输入：fruits = <span class="hljs-comment">[0,1,2,2]</span><br>输出：3<br>解释：可以采摘 <span class="hljs-comment">[1,2,2]</span> 这三棵树。<br>如果从第一棵树开始采摘，则只能采摘 <span class="hljs-comment">[0,1]</span> 这两棵树。<br></code></pre></td></tr></table></figure><p><strong>示例 3：</strong></p><figure class="highlight inform7"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs inform7">输入：fruits = <span class="hljs-comment">[1,2,3,2,2]</span><br>输出：4<br>解释：可以采摘 <span class="hljs-comment">[2,3,2,2]</span> 这四棵树。<br>如果从第一棵树开始采摘，则只能采摘 <span class="hljs-comment">[1,2]</span> 这两棵树。<br></code></pre></td></tr></table></figure><p><strong>示例 4：</strong></p><figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs dns">输入：fruits = [<span class="hljs-number">3,3,3,1</span>,<span class="hljs-number">2,1,1,2</span>,<span class="hljs-number">3</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>]<br>输出：<span class="hljs-number">5</span><br>解释：可以采摘 [<span class="hljs-number">1,2,1,1</span>,<span class="hljs-number">2</span>] 这五棵树。<br></code></pre></td></tr></table></figure><p><strong>提示：</strong></p><ul><li><code>1 &lt;= fruits.length &lt;= 10^5</code></li><li><code>0 &lt;= fruits[i] &lt; fruits.length</code></li></ul><h2 id="题解">2 题解</h2><h3 id="滑动窗口">2.1 滑动窗口</h3><p><strong>思路：</strong></p><p>枚举右端点，将当前滑动窗口中有多少种类的水果，每种有多少个记录到哈希表中，判断条件时，直接看哈希表的长度即可。</p><p><strong>时间复杂度：</strong>O(n)</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">totalFruit</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; fruits)</span> </span>&#123;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br>        unordered_map&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt; basket; <span class="hljs-comment">// 记录水果类型-采摘个数</span><br>        <span class="hljs-type">int</span> fruitsSize = fruits.<span class="hljs-built_in">size</span>(), left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">while</span> (right &lt; fruitsSize) &#123; <span class="hljs-comment">// 枚举右端点</span><br>            basket[fruits[right++]]++;<br>            <span class="hljs-keyword">while</span> (!(basket.<span class="hljs-built_in">size</span>() &lt;= <span class="hljs-number">2</span>)) &#123; <span class="hljs-comment">// 不满足条件时，移动左端点</span><br>                basket[fruits[left]]--;<br>                <span class="hljs-keyword">if</span> (basket[fruits[left]] == <span class="hljs-number">0</span>) <br>                    basket.<span class="hljs-built_in">erase</span>(fruits[left]);<br>                left++;<br>            &#125;<br>            ans = <span class="hljs-built_in">max</span>(ans, right - left);<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+      <category>Question</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Leetcode</tag>
+      
+      <tag>滑动窗口</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Leetcode-find-the-longest-semi-repetitive-substring</title>
+    <link href="/2024/10/05/Leetcode-find-the-longest-semi-repetitive-substring/"/>
+    <url>/2024/10/05/Leetcode-find-the-longest-semi-repetitive-substring/</url>
+    
+    <content type="html"><![CDATA[<h2 id="题目描述">1 题目描述</h2><p>给你一个下标从 <strong>0</strong> 开始的字符串 <code>s</code>，这个字符串只包含 <code>0</code> 到 <code>9</code> 的数字字符。</p><p>如果一个字符串 <code>t</code>中至多有一对相邻字符是相等的，那么称这个字符串 <code>t</code> 是<strong>半重复的</strong> 。例如，<code>"0010"</code>、<code>"002020"</code> 、<code>"0123"</code> 、<code>"2002"</code> 和<code>"54944"</code> 是半重复字符串，而 <code>"00101022"</code>（相邻的相同数字对是 00 和 22）和 <code>"1101234883"</code>（相邻的相同数字对是 11 和 88）不是半重复字符串。</p><p>请你返回 <code>s</code> 中最长 <strong>半重复</strong> 子字符串的长度。</p><p><strong>示例 1：</strong></p><p><strong>输入：</strong>s = "52233"</p><p><strong>输出：</strong>4</p><p><strong>解释：</strong></p><p>最长的半重复子字符串是 "5223"。整个字符串 "52233"有两个相邻的相同数字对 22 和 33，但最多只能选取一个。</p><p><strong>示例 2：</strong></p><p><strong>输入：</strong>s = "5494"</p><p><strong>输出：</strong>4</p><p><strong>解释：</strong></p><p><code>s</code> 是一个半重复字符串。</p><p><strong>示例 3：</strong></p><p><strong>输入：</strong>s = "1111111"</p><p><strong>输出：</strong>2</p><p><strong>解释：</strong></p><p>最长的半重复子字符串是 "11"。子字符串 "111"有两个相邻的相同数字对，但最多允许选取一个。</p><p><strong>提示：</strong></p><ul><li><code>1 &lt;= s.length &lt;= 50</code></li><li><code>'0' &lt;= s[i] &lt;= '9'</code></li></ul><h2 id="题解">2 题解</h2><h3 id="滑动窗口">2.1 滑动窗口</h3><p><strong>思路：</strong></p><p>枚举右指针，如果满足条件计算答案，不满足就先移动左指针，直到满足条件时计算答案。</p><p>条件也就是窗口内包含几处相邻字符是相同的。</p><p><strong>时间复杂度：</strong>O(n)</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">longestSemiRepetitiveSubstring</span><span class="hljs-params">(string s)</span> </span>&#123;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> sSize = s.<span class="hljs-built_in">size</span>(), left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> count = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">while</span> (right &lt; sSize) &#123;<br>            count = count + (right &gt; <span class="hljs-number">0</span> &amp;&amp; s[right - <span class="hljs-number">1</span>] == s[right]); <span class="hljs-comment">// 读入right</span><br>            right++;<br>            <span class="hljs-keyword">while</span> (!(count &lt;= <span class="hljs-number">1</span>)) &#123; <span class="hljs-comment">// 不满足条件时弹出left</span><br>                count = count - (left &lt; sSize &amp;&amp; s[left] == s[left + <span class="hljs-number">1</span>]);<br>                left++;<br>            &#125;<br>            ans = <span class="hljs-built_in">max</span>(ans, right - left);<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+      <category>Question</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Leetcode</tag>
+      
+      <tag>滑动窗口</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Leetcode-get-equal-substrings-within-budget</title>
+    <link href="/2024/10/05/Leetcode-get-equal-substrings-within-budget/"/>
+    <url>/2024/10/05/Leetcode-get-equal-substrings-within-budget/</url>
+    
+    <content type="html"><![CDATA[<h2 id="题目描述">1 题目描述</h2><p>给你两个长度相同的字符串，<code>s</code> 和 <code>t</code>。</p><p>将 <code>s</code> 中的第 <code>i</code> 个字符变到 <code>t</code>中的第 <code>i</code> 个字符需要 <code>|s[i] - t[i]|</code>的开销（开销可能为 0），也就是两个字符的 ASCII 码值的差的绝对值。</p><p>用于变更字符串的最大预算是<code>maxCost</code>。在转化字符串时，总开销应当小于等于该预算，这也意味着字符串的转化可能是不完全的。</p><p>如果你可以将 <code>s</code> 的子字符串转化为它在 <code>t</code>中对应的子字符串，则返回可以转化的最大长度。</p><p>如果 <code>s</code> 中没有子字符串可以转化成 <code>t</code>中对应的子字符串，则返回 <code>0</code>。</p><p><strong>示例 1：</strong></p><figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs excel">输入：s = <span class="hljs-string">&quot;abcd&quot;</span>, <span class="hljs-built_in">t</span> = <span class="hljs-string">&quot;bcdf&quot;</span>, maxCost = <span class="hljs-number">3</span><br>输出：<span class="hljs-number">3</span><br>解释：s 中的 <span class="hljs-string">&quot;abc&quot;</span> 可以变为 <span class="hljs-string">&quot;bcd&quot;</span>。开销为 <span class="hljs-number">3</span>，所以最大长度为 <span class="hljs-number">3</span>。<br></code></pre></td></tr></table></figure><p><strong>示例 2：</strong></p><figure class="highlight excel"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs excel">输入：s = <span class="hljs-string">&quot;abcd&quot;</span>, <span class="hljs-built_in">t</span> = <span class="hljs-string">&quot;cdef&quot;</span>, maxCost = <span class="hljs-number">3</span><br>输出：<span class="hljs-number">1</span><br>解释：s 中的任一字符要想变成 <span class="hljs-built_in">t</span> 中对应的字符，其开销都是 <span class="hljs-number">2</span>。因此，最大长度为 <span class="hljs-number">1</span>。<br></code></pre></td></tr></table></figure><p><strong>示例 3：</strong></p><figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs livecodeserver">输入：s = <span class="hljs-string">&quot;abcd&quot;</span>, t = <span class="hljs-string">&quot;acde&quot;</span>, maxCost = <span class="hljs-number">0</span><br>输出：<span class="hljs-number">1</span><br>解释：<span class="hljs-keyword">a</span> -&gt; <span class="hljs-keyword">a</span>, cost = <span class="hljs-number">0</span>，字符串未发生变化，所以最大长度为 <span class="hljs-number">1</span>。<br></code></pre></td></tr></table></figure><p><strong>提示：</strong></p><ul><li><code>1 &lt;= s.length, t.length &lt;= 10^5</code></li><li><code>0 &lt;= maxCost &lt;= 10^6</code></li><li><code>s</code> 和 <code>t</code> 都只含小写英文字母。</li></ul><h2 id="题解">2 题解</h2><h3 id="滑动窗口">2.1 滑动窗口</h3><p><strong>思路：</strong></p><p>枚举右指针</p><ul><li>如果符合条件，跳过第二步</li><li>移动左指针，直到符合条件</li><li>计算答案</li></ul><p><strong>时间复杂度：</strong>O(n)</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">equalSubstring</span><span class="hljs-params">(string s, string t, <span class="hljs-type">int</span> maxCost)</span> </span>&#123;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> sSize = s.<span class="hljs-built_in">size</span>(), left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> cost = <span class="hljs-number">0</span>;<br><br>        <span class="hljs-keyword">while</span> (right &lt; sSize) &#123; <span class="hljs-comment">// 先枚举右端点</span><br>            cost = cost + <span class="hljs-built_in">abs</span>(s[right] - t[right]);<br>            right++;<br>            <span class="hljs-keyword">while</span> (!(cost &lt;= maxCost)) &#123; <span class="hljs-comment">// 不满足条件时，移动左端点</span><br>                cost = cost - (<span class="hljs-built_in">abs</span>(s[left] - t[left]));<br>                left++;<br>            &#125;<br>            ans = <span class="hljs-built_in">max</span>(ans, right - left);<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+      <category>Question</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Leetcode</tag>
+      
+      <tag>滑动窗口</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Leetcode-longest-subarray-of-1s-after-deleting-one-element</title>
+    <link href="/2024/10/05/Leetcode-longest-subarray-of-1s-after-deleting-one-element/"/>
+    <url>/2024/10/05/Leetcode-longest-subarray-of-1s-after-deleting-one-element/</url>
+    
+    <content type="html"><![CDATA[<h2 id="题目描述">1 题目描述</h2><p>给你一个二进制数组 <code>nums</code> ，你需要从中删掉一个元素。</p><p>请你在删掉元素的结果数组中，返回最长的且只包含 1的非空子数组的长度。</p><p>如果不存在这样的子数组，请返回 0 。</p><p><strong>提示 1：</strong></p><figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs tap">输入：nums = [1,1,0,1]<br>输出：3<br>解释：删掉位置<span class="hljs-number"> 2 </span>的数后，[1,1,1] 包含<span class="hljs-number"> 3 </span>个<span class="hljs-number"> 1 </span>。<br></code></pre></td></tr></table></figure><p><strong>示例 2：</strong></p><figure class="highlight dns"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs dns">输入：nums = [<span class="hljs-number">0,1,1,1</span>,<span class="hljs-number">0,1,1,0</span>,<span class="hljs-number">1</span>]<br>输出：<span class="hljs-number">5</span><br>解释：删掉位置 <span class="hljs-number">4</span> 的数字后，[<span class="hljs-number">0,1,1,1</span>,<span class="hljs-number">1,1,0,1</span>] 的最长全 <span class="hljs-number">1</span> 子数组为 [<span class="hljs-number">1,1,1,1</span>,<span class="hljs-number">1</span>] 。<br></code></pre></td></tr></table></figure><p><strong>示例 3：</strong></p><figure class="highlight fix"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs fix"><span class="hljs-attr">输入：nums </span>=<span class="hljs-string"> [1,1,1]</span><br><span class="hljs-string">输出：2</span><br><span class="hljs-string">解释：你必须要删除一个元素。</span><br></code></pre></td></tr></table></figure><p><strong>提示：</strong></p><ul><li><code>1 &lt;= nums.length &lt;= 10^5</code></li><li><code>nums[i]</code> 要么是 <code>0</code> 要么是 <code>1</code>。</li></ul><h2 id="题解">2 题解</h2><h3 id="滑动窗口">2.1 滑动窗口</h3><p><strong>思路：</strong></p><p>先枚举右端点，如果满足条件就计算答案，不满足条件时，不断移动左端点直到满足条件。其实也就是读入，弹出、计算答案。但是这里的弹出，需要看条件是否满足，所以可能弹出0或任意多次。</p><p><strong>时间复杂度：</strong>O(n)</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">longestSubarray</span><span class="hljs-params">(vector&lt;<span class="hljs-type">int</span>&gt;&amp; nums)</span> </span>&#123;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> numsSize = nums.<span class="hljs-built_in">size</span>(), left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> count = <span class="hljs-number">0</span>; <span class="hljs-comment">// 记录子字符串包含了几个0。</span><br><br>        <span class="hljs-keyword">while</span> (right &lt; numsSize) &#123; <span class="hljs-comment">// 枚举右端点</span><br>            count = count + (nums[right++] == <span class="hljs-number">0</span>);<br>            <span class="hljs-keyword">while</span> (!(count &lt;= <span class="hljs-number">1</span>)) &#123; <span class="hljs-comment">// 当条件不符合时，移动左端点。</span><br>                count = count - (nums[left++] == <span class="hljs-number">0</span>);<br>            &#125;<br>            ans = <span class="hljs-built_in">max</span>(ans, right - left);<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans - <span class="hljs-number">1</span>;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+      <category>Question</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Leetcode</tag>
+      
+      <tag>滑动窗口</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Leetcode-longest-substring-without-repeating-characters</title>
+    <link href="/2024/10/05/Leetcode-longest-substring-without-repeating-characters/"/>
+    <url>/2024/10/05/Leetcode-longest-substring-without-repeating-characters/</url>
+    
+    <content type="html"><![CDATA[<h2 id="题目描述">1 题目描述</h2><p>给定一个字符串 <code>s</code> ，请你找出其中不含有重复字符的<strong>最长子串</strong> 的长度。</p><p><strong>子字符串</strong> <strong>是字符串中连续的</strong><strong>非空</strong> <strong>字符序列。</strong></p><p><strong>示例 1:</strong></p><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-section">输入: s = &quot;abcabcbb&quot;</span><br><span class="hljs-section">输出: 3 </span><br><span class="hljs-section">解释: 因为无重复字符的最长子串是 &quot;abc&quot;，所以其长度为 3。</span><br></code></pre></td></tr></table></figure><p><strong>示例 2:</strong></p><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-section">输入: s = &quot;bbbbb&quot;</span><br><span class="hljs-section">输出: 1</span><br><span class="hljs-section">解释: 因为无重复字符的最长子串是 &quot;b&quot;，所以其长度为 1。</span><br></code></pre></td></tr></table></figure><p><strong>示例 3:</strong></p><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-section">输入: s = &quot;pwwkew&quot;</span><br><span class="hljs-section">输出: 3</span><br><span class="hljs-section">解释: 因为无重复字符的最长子串是 &quot;wke&quot;，所以其长度为 3。</span><br>     请注意，你的答案必须是 子串 的长度，<span class="hljs-string">&quot;pwke&quot;</span> 是一个子序列，不是子串。<br></code></pre></td></tr></table></figure><p><strong>提示：</strong></p><ul><li><code>0 &lt;= s.length &lt;= 5 * 10^4</code></li><li><code>s</code> 由英文字母、数字、符号和空格组成</li></ul><h2 id="题解">2 题解</h2><h3 id="滑动窗口">2.1 滑动窗口</h3><p><strong>思路：</strong></p><p>不是定长滑动窗口了，所以不需要构造初始窗口，直接开始移动右边界，直到不满足条件时，不断移动左边界直到可以满足条件，每一次满足条件时都计算一次答案。</p><p>进一步理解，可以看作是枚举右指针，如果出现问题，就不断移动左指针。</p><p><strong>时间复杂度：</strong>O(n)</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-keyword">class</span> <span class="hljs-title class_">Solution</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">lengthOfLongestSubstring</span><span class="hljs-params">(string s)</span> </span>&#123;<br>        <span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> sSize = s.<span class="hljs-built_in">size</span>(), left = <span class="hljs-number">0</span>, right = <span class="hljs-number">0</span>;<br>        <span class="hljs-type">int</span> alphaArray[<span class="hljs-number">200</span>] = &#123;&#125;; <span class="hljs-comment">// 每种字符上有多少次重复</span><br><br>        <span class="hljs-keyword">while</span> (right &lt; sSize) &#123; <span class="hljs-comment">// 移动右指针，直到不可计算答案</span><br>            alphaArray[s[right++]]++;<br>            <span class="hljs-keyword">while</span> (alphaArray[s[right - <span class="hljs-number">1</span>]] &gt; <span class="hljs-number">1</span>) &#123; <span class="hljs-comment">// 如果发现不符合条件，移动左指针，直到可以计算答案</span><br>                alphaArray[s[left++]]--;<br>            &#125;<br>            ans = <span class="hljs-built_in">max</span>(ans, right - left);<br>        &#125;<br>        <span class="hljs-keyword">return</span> ans;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>C++</category>
+      
+      <category>Question</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Leetcode</tag>
+      
+      <tag>滑动窗口</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>Leetcode-contains-duplicate-iii</title>
     <link href="/2024/10/04/Leetcode-contains-duplicate-iii/"/>
     <url>/2024/10/04/Leetcode-contains-duplicate-iii/</url>
