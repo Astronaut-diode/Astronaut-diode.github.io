@@ -4,6 +4,33 @@
   
   
   <entry>
+    <title>lua的文件操作</title>
+    <link href="/2024/10/14/lua%E7%9A%84%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/"/>
+    <url>/2024/10/14/lua%E7%9A%84%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/</url>
+    
+    <content type="html"><![CDATA[<h2 id="函数">1 函数</h2><table><thead><tr><th style="text-align: center;">函数</th><th style="text-align: center;">效果</th></tr></thead><tbody><tr><td style="text-align: center;">lfs.currentdir()</td><td style="text-align: center;">获取当前位置</td></tr><tr><td style="text-align: center;">lfs.attributes(filepath)</td><td style="text-align: center;">获取目标文件的属性</td></tr><tr><td style="text-align: center;">lfs.dir(filepath)</td><td style="text-align: center;">遍历目标目录</td></tr><tr><td style="text-align: center;">lfs.chdir(filepath)</td><td style="text-align: center;">切换工作目录</td></tr><tr><td style="text-align: center;">lfs.mkdir(dirname)</td><td style="text-align: center;">在当前目录创建目标文件夹</td></tr><tr><td style="text-align: center;">lfs.rmdir(dirname)</td><td style="text-align: center;">在当前目录下删除目标文件夹</td></tr></tbody></table><h2 id="代码">2 代码</h2><figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs lua"><span class="hljs-keyword">local</span> lfs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;lfs&quot;</span>)<br><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">showMes</span><span class="hljs-params">()</span></span><br><span class="hljs-keyword">local</span> pwd = lfs.currentdir() <span class="hljs-comment">-- 获取当前位置</span><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">string</span>.<span class="hljs-built_in">format</span>(<span class="hljs-string">&quot;当前的所在位置为:%s&quot;</span>, pwd))<br><br><span class="hljs-keyword">local</span> attr = lfs.attributes(pwd) <span class="hljs-comment">-- 获取目标文件的属性</span><br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;以下是当前文件夹的一些属性:&quot;</span>) <span class="hljs-comment">-- 获取目标的属性，可以用其中的mode属性判断是否是文件夹还是文件</span><br><span class="hljs-keyword">for</span> key, value <span class="hljs-keyword">in</span> <span class="hljs-built_in">pairs</span>(attr) <span class="hljs-keyword">do</span><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;key:&quot;</span> .. key .. <span class="hljs-string">&quot;,value:&quot;</span> .. value)<br><span class="hljs-keyword">end</span><br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;以下是当前文件夹中包含的文件:&quot;</span>)<br><span class="hljs-keyword">for</span> file <span class="hljs-keyword">in</span> lfs.dir(pwd) <span class="hljs-keyword">do</span> <span class="hljs-comment">-- 遍历目标文件夹</span><br><span class="hljs-built_in">print</span>(file)<br><span class="hljs-keyword">end</span><br><span class="hljs-keyword">end</span><br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;创建了文件夹kukuku&quot;</span>)<br>lfs.mkdir(<span class="hljs-string">&quot;kukuku&quot;</span>)<br><span class="hljs-comment">-- 如果需要创建文件，使用普通io的手法进行创建。</span><br>showMes()<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;删除了文件夹kukuku&quot;</span>)<br>lfs.rmdir(<span class="hljs-string">&quot;kukuku&quot;</span>)<br><span class="hljs-comment">-- 如果需要删除文件，那就使用os.execute()或者io.popen()去执行系统命令</span><br>showMes()<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;切换目录以后&quot;</span> .. lfs.currentdir():<span class="hljs-built_in">gsub</span>(<span class="hljs-string">&quot;/%a+$&quot;</span>, <span class="hljs-string">&quot;&quot;</span>))<br>lfs.chdir(lfs.currentdir():<span class="hljs-built_in">gsub</span>(<span class="hljs-string">&quot;/%a+$&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)) <span class="hljs-comment">-- 切换到上级目录，进而可用其他的命令，并且不在当前的目录下执行。</span><br>showMes()<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>Lua</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Lua</tag>
+      
+      <tag>lfs</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>lua导包的部分细节</title>
     <link href="/2024/10/13/lua%E5%AF%BC%E5%8C%85%E7%9A%84%E9%83%A8%E5%88%86%E7%BB%86%E8%8A%82/"/>
     <url>/2024/10/13/lua%E5%AF%BC%E5%8C%85%E7%9A%84%E9%83%A8%E5%88%86%E7%BB%86%E8%8A%82/</url>
