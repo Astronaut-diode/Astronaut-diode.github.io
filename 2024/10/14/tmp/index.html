@@ -19,24 +19,23 @@
   <meta name="author" content="锋">
   <meta name="keywords" content="">
   
-    <meta name="description" content="对lua语言中，如何导入包，且对多次导入时是重新导入，还是使用缓存进行了区分。">
+    <meta name="description" content="对lua语言中，如何使用lfs进行文件操作进行了示例。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="lua导包的部分细节">
-<meta property="og:url" content="https://astronaut-diode.github.io/2024/10/13/lua%E5%AF%BC%E5%8C%85%E7%9A%84%E9%83%A8%E5%88%86%E7%BB%86%E8%8A%82/index.html">
+<meta property="og:title" content="tmp">
+<meta property="og:url" content="https://astronaut-diode.github.io/2024/10/14/tmp/index.html">
 <meta property="og:site_name" content="锋的博客">
-<meta property="og:description" content="对lua语言中，如何导入包，且对多次导入时是重新导入，还是使用缓存进行了区分。">
+<meta property="og:description" content="对lua语言中，如何使用lfs进行文件操作进行了示例。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-10-13T03:46:20.000Z">
-<meta property="article:modified_time" content="2024-10-13T04:23:01.962Z">
+<meta property="article:published_time" content="2024-10-14T12:54:28.000Z">
+<meta property="article:modified_time" content="2024-12-10T11:04:51.707Z">
 <meta property="article:author" content="锋">
 <meta property="article:tag" content="Lua">
-<meta property="article:tag" content="require">
-<meta property="article:tag" content="dofile">
+<meta property="article:tag" content="lfs">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>lua导包的部分细节 - 锋的博客</title>
+  <title>tmp - 锋的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -202,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="lua导包的部分细节"></span>
+            <span id="subtitle" data-typed-text="tmp"></span>
           
         </div>
 
@@ -218,8 +217,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-10-13 11:46" pubdate>
-          星期日, 十月 13日 2024, 11:46 中午
+        <time datetime="2024-10-14 20:54" pubdate>
+          星期一, 十月 14日 2024, 8:54 晚上
         </time>
       </span>
     
@@ -231,7 +230,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          650 字
+          338 字
         
       </span>
     
@@ -243,7 +242,7 @@
         
         
           <!-- compatible with older versions-->
-          6 分钟
+          3 分钟
         
       </span>
     
@@ -297,26 +296,48 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">lua导包的部分细节</h1>
+            <h1 id="seo-header">tmp</h1>
             
             
               <div class="markdown-body">
                 
-                <p>在使用lua语言时，如果使用<code>require</code>引入其他模块，Lua会检测目标模块在当前进程是否是第一次加载。如果是第一次加载，Lua会将结果加入到全局缓存表<code>_LOADED</code>中；如果不是第一次加载，lua会从<code>_LOADED</code>中取出目标，不再重新加载。</p>
-<h2 id="场景">1 场景</h2>
-<p>假设有两个好朋友A和B，A最近完成了一道题目，然后喊B来写此题目。<code>question.lua</code>记录的是题目以及答题卷，而<code>A.lua</code>代表用户A，<code>B.lua</code>代表用户B。以下为相关的源代码：</p>
-<p><strong>question.lua</strong></p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs lua">_M = &#123;&#125;<br>_M.question = <span class="hljs-string">&quot;1 + 1 = ？&quot;</span><br>_M.ans = <span class="hljs-literal">nil</span><br><br><span class="hljs-keyword">return</span> _M<br></code></pre></td></tr></table></figure>
-<p><strong>A.lua</strong></p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs lua">question = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;question&quot;</span>)<br>B = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;B&quot;</span>)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;A查看题目的内容:&quot;</span> .. question[<span class="hljs-string">&quot;question&quot;</span>])<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;A在试卷上写下答案:&quot;</span> .. <span class="hljs-number">2</span>)<br>question[<span class="hljs-string">&quot;ans&quot;</span>] = <span class="hljs-number">2</span><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;A喊来了自己的好朋友B一起写&quot;</span>)<br>B.answer()<br></code></pre></td></tr></table></figure>
-<p><strong>B.lua</strong></p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs lua">_M = &#123;&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_M.answer</span><span class="hljs-params">()</span></span><br>	question = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;question&quot;</span>) <span class="hljs-comment">-- B加载试卷</span><br>	<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;B发话了，我先看看试卷&quot;</span>)<br>	<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;试卷上的题目为：&quot;</span> .. question[<span class="hljs-string">&quot;question&quot;</span>])<br>	<span class="hljs-keyword">if</span> question[<span class="hljs-string">&quot;ans&quot;</span>] ~= <span class="hljs-literal">nil</span> <span class="hljs-keyword">then</span><br>		<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;答题区域赫然写着：&quot;</span> .. question[<span class="hljs-string">&quot;ans&quot;</span>])<br>		<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;B说：你都写完了，还让我写&quot;</span>)<br>	<span class="hljs-keyword">else</span><br>		<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;B在新的答题试卷上写下了答案&quot;</span>)<br>		question[<span class="hljs-string">&quot;ans&quot;</span>] = <span class="hljs-number">2</span><br>	<span class="hljs-keyword">end</span><br><span class="hljs-keyword">end</span><br><br><span class="hljs-keyword">return</span> _M<br></code></pre></td></tr></table></figure>
-<p>执行情况如下：</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">diode@ubuntu:~/lua$ lua A.lua <br>A查看题目的内容:1 + 1 = ？<br>A在试卷上写下答案:2<br>A喊来了自己的好朋友B一起写<br>B发话了，我先看看试卷<br>试卷上的题目为：1 + 1 = ？<br>答题区域赫然写着：2<br>B说：你都写完了，还让我写<br></code></pre></td></tr></table></figure>
-<p>出现这种情况的原因就是因为使用了require函数加载模块，所以当需要加载一张新试卷时，不应该继续使用require加载模块，而是使用<code>dofile("文件名")</code>去直接加载文件。所以当B.lua进行如下修改后，即可正确执行程序。</p>
-<p><strong>B.lua</strong></p>
-<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs lua">_M = &#123;&#125;<br><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">_M.answer</span><span class="hljs-params">()</span></span><br>	question = <span class="hljs-built_in">dofile</span>(<span class="hljs-string">&quot;question.lua&quot;</span>)<br>	<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;B发话了，我先看看试卷&quot;</span>)<br>	<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;试卷上的题目为：&quot;</span> .. question[<span class="hljs-string">&quot;question&quot;</span>])<br>	<span class="hljs-keyword">if</span> question[<span class="hljs-string">&quot;ans&quot;</span>] ~= <span class="hljs-literal">nil</span> <span class="hljs-keyword">then</span><br>		<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;答题区域赫然写着：&quot;</span> .. question[<span class="hljs-string">&quot;ans&quot;</span>])<br>		<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;B说：你都写完了，还让我写&quot;</span>)<br>	<span class="hljs-keyword">else</span><br>		<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;B在新的答题试卷上写下了答案&quot;</span>)<br>		question[<span class="hljs-string">&quot;ans&quot;</span>] = <span class="hljs-number">2</span><br>	<span class="hljs-keyword">end</span><br><span class="hljs-keyword">end</span><br><br><span class="hljs-keyword">return</span> _M<br></code></pre></td></tr></table></figure>
-<p>执行结果如下： <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">diode@ubuntu:~/lua$ lua A.lua <br>A查看题目的内容:1 + 1 = ？<br>A在试卷上写下答案:2<br>A喊来了自己的好朋友B一起写<br>B发话了，我先看看试卷<br>试卷上的题目为：1 + 1 = ？<br>B在新的答题试卷上写下了答案<br></code></pre></td></tr></table></figure></p>
+                <h2 id="函数">1 函数</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">函数</th>
+<th style="text-align: center;">效果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">lfs.currentdir()</td>
+<td style="text-align: center;">获取当前位置</td>
+</tr>
+<tr>
+<td style="text-align: center;">lfs.attributes(filepath)</td>
+<td style="text-align: center;">获取目标文件的属性</td>
+</tr>
+<tr>
+<td style="text-align: center;">lfs.dir(filepath)</td>
+<td style="text-align: center;">遍历目标目录</td>
+</tr>
+<tr>
+<td style="text-align: center;">lfs.chdir(filepath)</td>
+<td style="text-align: center;">切换工作目录</td>
+</tr>
+<tr>
+<td style="text-align: center;">lfs.mkdir(dirname)</td>
+<td style="text-align: center;">在当前目录创建目标文件夹</td>
+</tr>
+<tr>
+<td style="text-align: center;">lfs.rmdir(dirname)</td>
+<td style="text-align: center;">在当前目录下删除目标文件夹</td>
+</tr>
+</tbody>
+</table>
+<h2 id="代码">2 代码</h2>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs lua"><span class="hljs-keyword">local</span> lfs = <span class="hljs-built_in">require</span>(<span class="hljs-string">&quot;lfs&quot;</span>)<br><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">showMes</span><span class="hljs-params">()</span></span><br>	<span class="hljs-keyword">local</span> pwd = lfs.currentdir() <span class="hljs-comment">-- 获取当前位置</span><br>	<span class="hljs-built_in">print</span>(<span class="hljs-built_in">string</span>.<span class="hljs-built_in">format</span>(<span class="hljs-string">&quot;当前的所在位置为:%s&quot;</span>, pwd))<br><br>	<span class="hljs-keyword">local</span> attr = lfs.attributes(pwd) <span class="hljs-comment">-- 获取目标文件的属性</span><br><br>	<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;以下是当前文件夹的一些属性:&quot;</span>) <span class="hljs-comment">-- 获取目标的属性，可以用其中的mode属性判断是否是文件夹还是文件</span><br>	<span class="hljs-keyword">for</span> key, value <span class="hljs-keyword">in</span> <span class="hljs-built_in">pairs</span>(attr) <span class="hljs-keyword">do</span><br>		<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;key:&quot;</span> .. key .. <span class="hljs-string">&quot;,value:&quot;</span> .. value)<br>	<span class="hljs-keyword">end</span><br><br>	<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;以下是当前文件夹中包含的文件:&quot;</span>)<br>	<span class="hljs-keyword">for</span> file <span class="hljs-keyword">in</span> lfs.dir(pwd) <span class="hljs-keyword">do</span> <span class="hljs-comment">-- 遍历目标文件夹</span><br>		<span class="hljs-built_in">print</span>(file)<br>	<span class="hljs-keyword">end</span><br><span class="hljs-keyword">end</span><br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;创建了文件夹kukuku&quot;</span>)<br>lfs.mkdir(<span class="hljs-string">&quot;kukuku&quot;</span>)<br><span class="hljs-comment">-- 如果需要创建文件，使用普通io的手法进行创建。</span><br>showMes()<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;删除了文件夹kukuku&quot;</span>)<br>lfs.rmdir(<span class="hljs-string">&quot;kukuku&quot;</span>)<br><span class="hljs-comment">-- 如果需要删除文件，那就使用os.execute()或者io.popen()去执行系统命令</span><br>showMes()<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;切换目录以后&quot;</span> .. lfs.currentdir():<span class="hljs-built_in">gsub</span>(<span class="hljs-string">&quot;/%a+$&quot;</span>, <span class="hljs-string">&quot;&quot;</span>))<br>lfs.chdir(lfs.currentdir():<span class="hljs-built_in">gsub</span>(<span class="hljs-string">&quot;/%a+$&quot;</span>, <span class="hljs-string">&quot;&quot;</span>)) <span class="hljs-comment">-- 切换到上级目录，进而可用其他的命令，并且不在当前的目录下执行。</span><br>showMes()<br></code></pre></td></tr></table></figure>
 
                 
               </div>
@@ -352,9 +373,7 @@
       
         <a href="/tags/Lua/" class="print-no-link">#Lua</a>
       
-        <a href="/tags/require/" class="print-no-link">#require</a>
-      
-        <a href="/tags/dofile/" class="print-no-link">#dofile</a>
+        <a href="/tags/lfs/" class="print-no-link">#lfs</a>
       
     </div>
   
@@ -366,8 +385,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>lua导包的部分细节</div>
-      <div>https://astronaut-diode.github.io/2024/10/13/lua导包的部分细节/</div>
+      <div>tmp</div>
+      <div>https://astronaut-diode.github.io/2024/10/14/tmp/</div>
     </div>
     <div class="license-meta">
       
@@ -379,7 +398,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年10月13日</div>
+          <div>2024年10月14日</div>
         </div>
       
       
@@ -411,9 +430,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/10/14/tmp/" title="tmp">
+                      <a href="/2024/10/14/lua%E7%9A%84%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/" title="lua的文件操作">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">tmp</span>
+                        <span class="hidden-mobile">lua的文件操作</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -421,8 +440,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/10/06/Leetcode-find-the-longest-equal-subarray/" title="Leetcode-find-the-longest-equal-subarray">
-                        <span class="hidden-mobile">Leetcode-find-the-longest-equal-subarray</span>
+                      <a href="/2024/10/13/lua%E5%AF%BC%E5%8C%85%E7%9A%84%E9%83%A8%E5%88%86%E7%BB%86%E8%8A%82/" title="lua导包的部分细节">
+                        <span class="hidden-mobile">lua导包的部分细节</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -511,7 +530,7 @@
       
         <a href="/2024/10/13/lua%E5%AF%BC%E5%8C%85%E7%9A%84%E9%83%A8%E5%88%86%E7%BB%86%E8%8A%82/" title="lua导包的部分细节"
            class="list-group-item list-group-item-action
-           active">
+           ">
           <span class="category-post">lua导包的部分细节</span>
         </a>
       
@@ -529,7 +548,7 @@
       
         <a href="/2024/10/14/tmp/" title="tmp"
            class="list-group-item list-group-item-action
-           ">
+           active">
           <span class="category-post">tmp</span>
         </a>
       
