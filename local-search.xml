@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>自制Shell脚本：tree命令</title>
+    <link href="/2024/12/19/%E8%87%AA%E5%88%B6Shell%E8%84%9A%E6%9C%AC%EF%BC%9Atree%E5%91%BD%E4%BB%A4/"/>
+    <url>/2024/12/19/%E8%87%AA%E5%88%B6Shell%E8%84%9A%E6%9C%AC%EF%BC%9Atree%E5%91%BD%E4%BB%A4/</url>
+    
+    <content type="html"><![CDATA[<h2 id="脚本详情">1 脚本详情</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">#</span><span class="language-bash">/bin/bash</span><br><br>function print() &#123;<br>    local path=$(basename $1) # 通过$()，执行basename命令，获取文件的基础名字。<br>    local depth=$2<br>    local bucket_array=(&quot;$&#123;@:3&#125;&quot;) # 获取传入参数从3往后的所有内容。<br>    if [ $&#123;depth&#125; -eq 0 ]; then # 判断条件，-eq表示相等。<br>        path=&quot;$&#123;path&#125;&quot;<br>    else<br>        if [ $&#123;bucket_array[$(( $&#123;#bucket_array[@]&#125; - 1 ))]&#125; -eq 1 ]; then # 运用$(())进行计算。<br>            path=&quot;├── $&#123;path&#125;&quot;<br>        else<br>            path=&quot;└── $&#123;path&#125;&quot;<br>        fi<br>        for index in $(seq $(( $&#123;#bucket_array[@]&#125; - 2 )) -1 0); do # 运用$(seq start step end)进行for循环。<br>            if [ $&#123;bucket_array[index]&#125; -eq 1 ]; then<br>                path=&quot;│   $&#123;path&#125;&quot;<br>            else<br>                path=&quot;    $&#123;path&#125;&quot;<br>            fi<br>        done<br>    fi  <br>    echo &quot;$&#123;path&#125;&quot;<br>&#125;<br><br>function tree() &#123;<br>    local pos=$1<br>    local depth=$2<br>    local bucket_array=(&quot;$&#123;@:3&#125;&quot;)<br>    print $&#123;pos&#125; $&#123;depth&#125; $&#123;bucket_array[@]&#125;<br>    local files=(&quot;$&#123;pos&#125;&quot;/*) # 获取目标目录下所有的内容，如果目标是个文件或者空目录，将直接返回&quot;原始路径/*&quot;的字符串。<br>    local files_length=$&#123;#files[@]&#125;<br>    if [ ! -e $&#123;files[0]&#125; ]; then # 如果目标文件并不存在，那就意味着不需要递归了。-e 表示存在，! 表示取反。<br>        return;<br>    fi  <br>    for index in $(seq 0 1 $(( files_length - 1 ))); do<br>        local tmp_array=($&#123;bucket_array[@]&#125;) # 将原始数组的内容全部读出来，再装载到()中，构成数组。<br>        if [ $&#123;index&#125; -eq $(( files_length - 1 )) ]; then<br>            tmp_array+=(&quot;0&quot;) # 向数组中追加内容。<br>        else<br>            tmp_array+=(&quot;1&quot;)<br>        fi<br>        tree $&#123;files[index]&#125; $(( depth + 1 )) $&#123;tmp_array[@]&#125;<br>    done<br>&#125;<br><br>pwd=$(pwd) # 使用$()，可以执行命令，并将结果记录下来。<br>depth=0<br>bucket=() # 创建数组的写法。<br>tree $&#123;pwd&#125; $&#123;depth&#125; $&#123;bucket[@]&#125; # 调用函数的写法，注意这里还调用了一个数组中的全部元素，并且没有设置为字符串。<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>Linux</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Shell脚本</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>lua的文件操作</title>
     <link href="/2024/10/14/lua%E7%9A%84%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/"/>
     <url>/2024/10/14/lua%E7%9A%84%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/</url>
