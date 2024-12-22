@@ -19,22 +19,23 @@
   <meta name="author" content="锋">
   <meta name="keywords" content="">
   
-    <meta name="description" content="使用Bash脚本编写Linux中tree命令。">
+    <meta name="description" content="在一个无序数组中，找到和为target的一个两元组，返回两个元素的下标。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="自制Bash脚本：tree命令">
-<meta property="og:url" content="https://astronaut-diode.github.io/2024/12/19/%E8%87%AA%E5%88%B6Shell%E8%84%9A%E6%9C%AC%EF%BC%9Atree%E5%91%BD%E4%BB%A4/index.html">
+<meta property="og:title" content="Leetcode-sort-integers-by-the-power-value">
+<meta property="og:url" content="https://astronaut-diode.github.io/2024/12/22/Leetcode-sort-integers-by-the-power-value/index.html">
 <meta property="og:site_name" content="锋的博客">
-<meta property="og:description" content="使用Bash脚本编写Linux中tree命令。">
+<meta property="og:description" content="在一个无序数组中，找到和为target的一个两元组，返回两个元素的下标。">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-12-19T04:39:08.000Z">
-<meta property="article:modified_time" content="2024-12-19T04:56:17.656Z">
+<meta property="article:published_time" content="2024-12-22T06:09:06.000Z">
+<meta property="article:modified_time" content="2024-12-22T06:13:53.264Z">
 <meta property="article:author" content="锋">
-<meta property="article:tag" content="Bash脚本">
+<meta property="article:tag" content="Leetcode">
+<meta property="article:tag" content="暴力">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>自制Bash脚本：tree命令 - 锋的博客</title>
+  <title>Leetcode-sort-integers-by-the-power-value - 锋的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -200,7 +201,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="自制Bash脚本：tree命令"></span>
+            <span id="subtitle" data-typed-text="Leetcode-sort-integers-by-the-power-value"></span>
           
         </div>
 
@@ -216,8 +217,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-12-19 12:39" pubdate>
-          星期四, 十二月 19日 2024, 12:39 下午
+        <time datetime="2024-12-22 14:09" pubdate>
+          星期日, 十二月 22日 2024, 2:09 下午
         </time>
       </span>
     
@@ -229,7 +230,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          384 字
+          709 字
         
       </span>
     
@@ -241,7 +242,7 @@
         
         
           <!-- compatible with older versions-->
-          4 分钟
+          6 分钟
         
       </span>
     
@@ -295,13 +296,46 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">自制Bash脚本：tree命令</h1>
+            <h1 id="seo-header">Leetcode-sort-integers-by-the-power-value</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="脚本详情">1 脚本详情</h2>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#/bin/bash</span><br><br><span class="hljs-keyword">function</span> <span class="hljs-function"><span class="hljs-title">print</span></span>() &#123;<br>    <span class="hljs-built_in">local</span> path=$(<span class="hljs-built_in">basename</span> <span class="hljs-variable">$1</span>) <span class="hljs-comment"># 通过$()，执行basename命令，获取文件的基础名字。</span><br>    <span class="hljs-built_in">local</span> depth=<span class="hljs-variable">$2</span><br>    <span class="hljs-built_in">local</span> bucket_array=(<span class="hljs-string">&quot;<span class="hljs-variable">$&#123;@:3&#125;</span>&quot;</span>) <span class="hljs-comment"># 获取传入参数从3往后的所有内容。</span><br>    <span class="hljs-keyword">if</span> [ <span class="hljs-variable">$&#123;depth&#125;</span> -eq 0 ]; <span class="hljs-keyword">then</span> <span class="hljs-comment"># 判断条件，-eq表示相等。</span><br>        path=<span class="hljs-string">&quot;<span class="hljs-variable">$&#123;path&#125;</span>&quot;</span><br>    <span class="hljs-keyword">else</span><br>        <span class="hljs-keyword">if</span> [ <span class="hljs-variable">$&#123;bucket_array[$(( <span class="hljs-variable">$&#123;#bucket_array[@]&#125;</span> - 1 ))]&#125;</span> -eq 1 ]; <span class="hljs-keyword">then</span> <span class="hljs-comment"># 运用$(())进行计算。</span><br>            path=<span class="hljs-string">&quot;├── <span class="hljs-variable">$&#123;path&#125;</span>&quot;</span><br>        <span class="hljs-keyword">else</span><br>            path=<span class="hljs-string">&quot;└── <span class="hljs-variable">$&#123;path&#125;</span>&quot;</span><br>        <span class="hljs-keyword">fi</span><br>        <span class="hljs-keyword">for</span> index <span class="hljs-keyword">in</span> $(<span class="hljs-built_in">seq</span> $(( <span class="hljs-variable">$&#123;#bucket_array[@]&#125;</span> - <span class="hljs-number">2</span> )) -1 0); <span class="hljs-keyword">do</span> <span class="hljs-comment"># 运用$(seq start step end)进行for循环。</span><br>            <span class="hljs-keyword">if</span> [ <span class="hljs-variable">$&#123;bucket_array[index]&#125;</span> -eq 1 ]; <span class="hljs-keyword">then</span><br>                path=<span class="hljs-string">&quot;│   <span class="hljs-variable">$&#123;path&#125;</span>&quot;</span><br>            <span class="hljs-keyword">else</span><br>                path=<span class="hljs-string">&quot;    <span class="hljs-variable">$&#123;path&#125;</span>&quot;</span><br>            <span class="hljs-keyword">fi</span><br>        <span class="hljs-keyword">done</span><br>    <span class="hljs-keyword">fi</span>  <br>    <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-variable">$&#123;path&#125;</span>&quot;</span><br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-function"><span class="hljs-title">tree</span></span>() &#123;<br>    <span class="hljs-built_in">local</span> pos=<span class="hljs-variable">$1</span><br>    <span class="hljs-built_in">local</span> depth=<span class="hljs-variable">$2</span><br>    <span class="hljs-built_in">local</span> bucket_array=(<span class="hljs-string">&quot;<span class="hljs-variable">$&#123;@:3&#125;</span>&quot;</span>)<br>    <span class="hljs-built_in">print</span> <span class="hljs-variable">$&#123;pos&#125;</span> <span class="hljs-variable">$&#123;depth&#125;</span> <span class="hljs-variable">$&#123;bucket_array[@]&#125;</span><br>    <span class="hljs-built_in">local</span> files=(<span class="hljs-string">&quot;<span class="hljs-variable">$&#123;pos&#125;</span>&quot;</span>/*) <span class="hljs-comment"># 获取目标目录下所有的内容，如果目标是个文件或者空目录，将直接返回&quot;原始路径/*&quot;的字符串。</span><br>    <span class="hljs-built_in">local</span> files_length=<span class="hljs-variable">$&#123;#files[@]&#125;</span><br>    <span class="hljs-keyword">if</span> [ ! -e <span class="hljs-variable">$&#123;files[0]&#125;</span> ]; <span class="hljs-keyword">then</span> <span class="hljs-comment"># 如果目标文件并不存在，那就意味着不需要递归了。-e 表示存在，! 表示取反。</span><br>        <span class="hljs-built_in">return</span>;<br>    <span class="hljs-keyword">fi</span>  <br>    <span class="hljs-keyword">for</span> index <span class="hljs-keyword">in</span> $(<span class="hljs-built_in">seq</span> 0 1 $(( files_length - <span class="hljs-number">1</span> ))); <span class="hljs-keyword">do</span><br>        <span class="hljs-built_in">local</span> tmp_array=(<span class="hljs-variable">$&#123;bucket_array[@]&#125;</span>) <span class="hljs-comment"># 将原始数组的内容全部读出来，再装载到()中，构成数组。</span><br>        <span class="hljs-keyword">if</span> [ <span class="hljs-variable">$&#123;index&#125;</span> -eq $(( files_length - <span class="hljs-number">1</span> )) ]; <span class="hljs-keyword">then</span><br>            tmp_array+=(<span class="hljs-string">&quot;0&quot;</span>) <span class="hljs-comment"># 向数组中追加内容。</span><br>        <span class="hljs-keyword">else</span><br>            tmp_array+=(<span class="hljs-string">&quot;1&quot;</span>)<br>        <span class="hljs-keyword">fi</span><br>        tree <span class="hljs-variable">$&#123;files[index]&#125;</span> $(( depth + <span class="hljs-number">1</span> )) <span class="hljs-variable">$&#123;tmp_array[@]&#125;</span><br>    <span class="hljs-keyword">done</span><br>&#125;<br><br><span class="hljs-built_in">pwd</span>=$(<span class="hljs-built_in">pwd</span>) <span class="hljs-comment"># 使用$()，可以执行命令，并将结果记录下来。</span><br>depth=0<br>bucket=() <span class="hljs-comment"># 创建数组的写法。</span><br>tree <span class="hljs-variable">$&#123;pwd&#125;</span> <span class="hljs-variable">$&#123;depth&#125;</span> <span class="hljs-variable">$&#123;bucket[@]&#125;</span> <span class="hljs-comment"># 调用函数的写法，注意这里还调用了一个数组中的全部元素，并且没有设置为字符串。</span><br></code></pre></td></tr></table></figure>
+                <h2 id="题目描述">1 题目描述</h2>
+<p>我们将整数 <code>x</code> 的 <strong>权重</strong>
+定义为按照下述规则将 <code>x</code> 变成 <code>1</code>
+所需要的步数：</p>
+<ul>
+<li>如果 <code>x</code> 是偶数，那么 <code>x = x / 2</code></li>
+<li>如果 <code>x</code> 是奇数，那么 <code>x = 3 * x + 1</code></li>
+</ul>
+<p>比方说，x=3 的权重为 7 。因为 3 需要 7 步变成 1 （3 --&gt; 10 --&gt;
+5 --&gt; 16 --&gt; 8 --&gt; 4 --&gt; 2 --&gt; 1）。</p>
+<p>给你三个整数 <code>lo</code>， <code>hi</code> 和 <code>k</code>
+。你的任务是将区间 <code>[lo, hi]</code> 之间的整数按照它们的权重
+<strong>升序排序</strong> ，如果大于等于 2 个整数有
+<strong>相同</strong> 的权重，那么按照数字自身的数值
+<strong>升序排序</strong> 。</p>
+<p>请你返回区间 <code>[lo, hi]</code> 之间的整数按权重排序后的第
+<code>k</code> 个数。</p>
+<p>注意，题目保证对于任意整数 <code>x</code>
+<code>（lo &lt;= x &lt;= hi）</code> ，它变成 <code>1</code>
+所需要的步数是一个 32 位有符号整数。</p>
+<p><strong>示例 1：</strong></p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs tap">输入：lo = 12, hi = 15, k = 2<br>输出：13<br>解释：12 的权重为 9（12 --&gt;<span class="hljs-number"> 6 </span>--&gt;<span class="hljs-number"> 3 </span>--&gt;<span class="hljs-number"> 10 </span>--&gt;<span class="hljs-number"> 5 </span>--&gt;<span class="hljs-number"> 16 </span>--&gt;<span class="hljs-number"> 8 </span>--&gt;<span class="hljs-number"> 4 </span>--&gt;<span class="hljs-number"> 2 </span>--&gt; 1）<br>13 的权重为 9<br>14 的权重为 17<br>15 的权重为 17<br>区间内的数按权重排序以后的结果为 [12,13,14,15] 。对于 k =<span class="hljs-number"> 2 </span>，答案是第二个整数也就是<span class="hljs-number"> 13 </span>。<br>注意，12 和<span class="hljs-number"> 13 </span>有相同的权重，所以我们按照它们本身升序排序。14 和<span class="hljs-number"> 15 </span>同理。<br></code></pre></td></tr></table></figure>
+<p><strong>示例 2：</strong></p>
+<figure class="highlight accesslog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs accesslog">输入：lo = <span class="hljs-number">7</span>, hi = <span class="hljs-number">11</span>, k = <span class="hljs-number">4</span><br>输出：<span class="hljs-number">7</span><br>解释：区间内整数 <span class="hljs-string">[7, 8, 9, 10, 11]</span> 对应的权重为 <span class="hljs-string">[16, 3, 19, 6, 14]</span> 。<br>按权重排序后得到的结果为 <span class="hljs-string">[8, 10, 11, 7, 9]</span> 。<br>排序后数组中第 <span class="hljs-number">4</span> 个数字为 <span class="hljs-number">7</span> 。<br></code></pre></td></tr></table></figure>
+<p><strong>提示：</strong></p>
+<ul>
+<li><code>1 &lt;= lo &lt;= hi &lt;= 1000</code></li>
+<li><code>1 &lt;= k &lt;= hi - lo + 1</code></li>
+</ul>
+<h2 id="题解">2 题解</h2>
+<h3 id="暴力解法">2.1 暴力解法</h3>
+<p><strong>思路：</strong></p>
+<p>求出1-1000这个区间中所有的权重，然后根据权重进行排序。</p>
+<p><strong>时间复杂度：</strong>O(n)，因为计算权重每个数字都只计算了一次。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">getKth</span><span class="hljs-params">(low <span class="hljs-type">int</span>, high <span class="hljs-type">int</span>, k <span class="hljs-type">int</span>)</span></span> <span class="hljs-type">int</span> &#123;<br>    <span class="hljs-keyword">var</span> memo []<span class="hljs-type">int</span> = <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">1000001</span>)<br>    <span class="hljs-keyword">var</span> nums []<span class="hljs-type">int</span> = <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">1001</span>)<br><br>    <span class="hljs-keyword">for</span> i := <span class="hljs-number">1</span>; i &lt; <span class="hljs-built_in">len</span>(memo); i = i * <span class="hljs-number">2</span> &#123; <span class="hljs-comment">// 初步计算出一部分的答案</span><br>        memo[i] = memo[i / <span class="hljs-number">2</span>] + <span class="hljs-number">1</span><br>    &#125;<br>    <span class="hljs-keyword">for</span> i := <span class="hljs-number">1</span>; i &lt; <span class="hljs-number">1001</span>; i++ &#123; <span class="hljs-comment">// 重新填写所有的答案。</span><br>        memo[i] = calMemo(memo, i)<br>        nums[i] = i<br>    &#125;<br>    nums = nums[low:high + <span class="hljs-number">1</span>]<br><br>    sort.Slice(nums, <span class="hljs-function"><span class="hljs-keyword">func</span><span class="hljs-params">(old <span class="hljs-type">int</span>, <span class="hljs-built_in">new</span> <span class="hljs-type">int</span>)</span></span> <span class="hljs-type">bool</span> &#123; <span class="hljs-comment">// 取出的是索引</span><br>        <span class="hljs-keyword">var</span> oldItme, newItme <span class="hljs-type">int</span> = nums[old], nums[<span class="hljs-built_in">new</span>] <span class="hljs-comment">// 将索引转换为原始数字</span><br>        <span class="hljs-keyword">var</span> oldItemWeight, newItemWeight <span class="hljs-type">int</span> = memo[oldItme], memo[newItme] <span class="hljs-comment">// 将原始数字转换为相应的权重</span><br>        <span class="hljs-comment">// 按照权重进行升序排序，如果权重相同，按照原始数字进行排序</span><br>        <span class="hljs-keyword">return</span> (oldItemWeight &lt; newItemWeight) || (oldItemWeight == newItemWeight &amp;&amp; oldItme &lt; newItme)<br>    &#125;)<br>    <span class="hljs-keyword">return</span> nums[k - <span class="hljs-number">1</span>]<br>&#125;<br><br><span class="hljs-comment">// 计算数字x需要多少次才能到1，memo是已经计算出来的结果。返回x需要的次数。</span><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">calMemo</span><span class="hljs-params">(memo []<span class="hljs-type">int</span>, x <span class="hljs-type">int</span>)</span></span> <span class="hljs-type">int</span> &#123;<br>    <span class="hljs-keyword">if</span> memo[x] == <span class="hljs-number">0</span> &#123; <span class="hljs-comment">// 进行正向推演。</span><br>        <span class="hljs-keyword">if</span> x % <span class="hljs-number">2</span> == <span class="hljs-number">0</span> &#123;<br>            memo[x] = calMemo(memo, x / <span class="hljs-number">2</span>) + <span class="hljs-number">1</span><br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            memo[x] = calMemo(memo, x * <span class="hljs-number">3</span> + <span class="hljs-number">1</span>) + <span class="hljs-number">1</span><br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> memo[x]<br>&#125;<br></code></pre></td></tr></table></figure>
 
                 
               </div>
@@ -320,12 +354,12 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Linux/" class="category-chain-item">Linux</a>
+  <a href="/categories/Go/" class="category-chain-item">Go</a>
   
   
     <span>></span>
     
-  <a href="/categories/Linux/Script/" class="category-chain-item">Script</a>
+  <a href="/categories/Go/Question/" class="category-chain-item">Question</a>
   
   
 
@@ -342,7 +376,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Bash%E8%84%9A%E6%9C%AC/" class="print-no-link">#Bash脚本</a>
+        <a href="/tags/Leetcode/" class="print-no-link">#Leetcode</a>
+      
+        <a href="/tags/%E6%9A%B4%E5%8A%9B/" class="print-no-link">#暴力</a>
       
     </div>
   
@@ -354,8 +390,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>自制Bash脚本：tree命令</div>
-      <div>https://astronaut-diode.github.io/2024/12/19/自制Shell脚本：tree命令/</div>
+      <div>Leetcode-sort-integers-by-the-power-value</div>
+      <div>https://astronaut-diode.github.io/2024/12/22/Leetcode-sort-integers-by-the-power-value/</div>
     </div>
     <div class="license-meta">
       
@@ -367,7 +403,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年12月19日</div>
+          <div>2024年12月22日</div>
         </div>
       
       
@@ -399,18 +435,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/12/22/Leetcode-sort-integers-by-the-power-value/" title="Leetcode-sort-integers-by-the-power-value">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Leetcode-sort-integers-by-the-power-value</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/10/14/lua%E7%9A%84%E6%96%87%E4%BB%B6%E6%93%8D%E4%BD%9C/" title="lua的文件操作">
-                        <span class="hidden-mobile">lua的文件操作</span>
+                      <a href="/2024/12/19/%E8%87%AA%E5%88%B6Shell%E8%84%9A%E6%9C%AC%EF%BC%9Atree%E5%91%BD%E4%BB%A4/" title="自制Bash脚本：tree命令">
+                        <span class="hidden-mobile">自制Bash脚本：tree命令</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -478,17 +508,17 @@
     
     <div class="category row nomargin-x">
       <a class="category-item 
-          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="Linux"
-        id="heading-edc9f0a5a5d57797bf68e37364743831" role="tab" data-toggle="collapse" href="#collapse-edc9f0a5a5d57797bf68e37364743831"
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="Go"
+        id="heading-5f075ae3e1f9d0382bb8c4632991f96f" role="tab" data-toggle="collapse" href="#collapse-5f075ae3e1f9d0382bb8c4632991f96f"
         aria-expanded="true"
       >
-        Linux
-        <span class="list-group-count">(2)</span>
+        Go
+        <span class="list-group-count">(1)</span>
         <i class="iconfont icon-arrowright"></i>
       </a>
       
-      <div class="category-collapse collapse show" id="collapse-edc9f0a5a5d57797bf68e37364743831"
-           role="tabpanel" aria-labelledby="heading-edc9f0a5a5d57797bf68e37364743831">
+      <div class="category-collapse collapse show" id="collapse-5f075ae3e1f9d0382bb8c4632991f96f"
+           role="tabpanel" aria-labelledby="heading-5f075ae3e1f9d0382bb8c4632991f96f">
         
         
           
@@ -505,17 +535,17 @@
     
     <div class="category-sub row nomargin-x">
       <a class="category-subitem 
-          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="Script"
-        id="heading-f907e651164789346ae0a1e257c462d8" role="tab" data-toggle="collapse" href="#collapse-f907e651164789346ae0a1e257c462d8"
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="Question"
+        id="heading-a97ea56b0e00b2379736ae60869ff66a" role="tab" data-toggle="collapse" href="#collapse-a97ea56b0e00b2379736ae60869ff66a"
         aria-expanded="true"
       >
-        Script
+        Question
         <span class="list-group-count">(1)</span>
         <i class="iconfont icon-arrowright"></i>
       </a>
       
-      <div class="category-collapse collapse show" id="collapse-f907e651164789346ae0a1e257c462d8"
-           role="tabpanel" aria-labelledby="heading-f907e651164789346ae0a1e257c462d8">
+      <div class="category-collapse collapse show" id="collapse-a97ea56b0e00b2379736ae60869ff66a"
+           role="tabpanel" aria-labelledby="heading-a97ea56b0e00b2379736ae60869ff66a">
         
         
           
@@ -524,47 +554,10 @@
     
       
       
-        <a href="/2024/12/19/%E8%87%AA%E5%88%B6Shell%E8%84%9A%E6%9C%AC%EF%BC%9Atree%E5%91%BD%E4%BB%A4/" title="自制Bash脚本：tree命令"
+        <a href="/2024/12/22/Leetcode-sort-integers-by-the-power-value/" title="Leetcode-sort-integers-by-the-power-value"
            class="list-group-item list-group-item-action
            active">
-          <span class="category-post">自制Bash脚本：tree命令</span>
-        </a>
-      
-    
-  </div>
-
-        
-      </div>
-    </div>
-  
-    
-    
-    
-    <div class="category-sub row nomargin-x">
-      <a class="category-subitem collapsed
-          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="Usage"
-        id="heading-c64518704ce0c0d5501a45763f464276" role="tab" data-toggle="collapse" href="#collapse-c64518704ce0c0d5501a45763f464276"
-        aria-expanded="false"
-      >
-        Usage
-        <span class="list-group-count">(1)</span>
-        <i class="iconfont icon-arrowright"></i>
-      </a>
-      
-      <div class="category-collapse collapse " id="collapse-c64518704ce0c0d5501a45763f464276"
-           role="tabpanel" aria-labelledby="heading-c64518704ce0c0d5501a45763f464276">
-        
-        
-          
-  <div class="category-post-list">
-    
-    
-      
-      
-        <a href="/2024/09/07/Linux%E5%91%BD%E4%BB%A4grep%E8%AF%A6%E8%A7%A3/" title="Linux命令grep详解"
-           class="list-group-item list-group-item-action
-           ">
-          <span class="category-post">Linux命令grep详解</span>
+          <span class="category-post">Leetcode-sort-integers-by-the-power-value</span>
         </a>
       
     
