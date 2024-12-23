@@ -4,6 +4,35 @@
   
   
   <entry>
+    <title>search-insert-position</title>
+    <link href="/2024/12/23/Leetcode-search-insert-position/"/>
+    <url>/2024/12/23/Leetcode-search-insert-position/</url>
+    
+    <content type="html"><![CDATA[<h2 id="题目描述">1 题目描述</h2><p>给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。</p><p>请必须使用时间复杂度为 <code>O(log n)</code> 的算法。</p><p><strong>示例 1:</strong></p><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-section">输入: nums = [1,3,5,6], target = 5</span><br><span class="hljs-section">输出: 2</span><br></code></pre></td></tr></table></figure><p><strong>示例 2:</strong></p><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-section">输入: nums = [1,3,5,6], target = 2</span><br><span class="hljs-section">输出: 1</span><br></code></pre></td></tr></table></figure><p><strong>示例 3:</strong></p><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs makefile"><span class="hljs-section">输入: nums = [1,3,5,6], target = 7</span><br><span class="hljs-section">输出: 4</span><br></code></pre></td></tr></table></figure><p><strong>提示:</strong></p><ul><li><code>1 &lt;= nums.length &lt;= 10^4</code></li><li><code>-10^4 &lt;= nums[i] &lt;= 10^4</code></li><li><code>nums</code> 为 <strong>无重复元素</strong> 的<strong>升序</strong> 排列数组</li><li><code>-10^4 &lt;= target &lt;= 10^4</code></li></ul><h2 id="题解">2 题解</h2><h3 id="二分搜索">2.1 二分搜索</h3><p><strong>思路：</strong></p><p>只要记住，low左边的元素都是小于目标的，high右边的元素都是大于目标的。那么他们跳出循环的时候只有找到了相等值，或者high和low已经交错，这也意味着没有相等值，而high和low中间的间隙就是插入的标准位置。</p><p><strong>时间复杂度：</strong>O(log n)</p><figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">searchInsert</span><span class="hljs-params">(nums []<span class="hljs-type">int</span>, target <span class="hljs-type">int</span>)</span></span> <span class="hljs-type">int</span> &#123;<br>    <span class="hljs-comment">// low左侧的元素都是小于当前目标的</span><br>    <span class="hljs-comment">// high右侧的元素都是大于当前目标的</span><br>    <span class="hljs-keyword">var</span> low, high <span class="hljs-type">int</span> = <span class="hljs-number">0</span>, <span class="hljs-built_in">len</span>(nums) - <span class="hljs-number">1</span><br><br>    <span class="hljs-keyword">for</span> ;low &lt;= high; &#123;<br>        <span class="hljs-keyword">var</span> mid <span class="hljs-type">int</span> = (low + high) / <span class="hljs-number">2</span><br><br>        <span class="hljs-keyword">if</span> nums[mid] == target &#123;<br>            <span class="hljs-keyword">return</span> mid<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> nums[mid] &lt; target &#123;<br>            low = mid + <span class="hljs-number">1</span><br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            high = mid - <span class="hljs-number">1</span><br>        &#125;<br>    &#125;<br>    <span class="hljs-comment">// 能跳出for但是没有返回值的情况只有一种，[....,high,low,...]，所以最佳的插入位置就是low。</span><br>    <span class="hljs-keyword">return</span> low<br>&#125;<br><br><br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>Go</category>
+      
+      <category>Question</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Leetcode</tag>
+      
+      <tag>二分搜索</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>majority-element</title>
     <link href="/2024/12/23/Leetcode-majority-element/"/>
     <url>/2024/12/23/Leetcode-majority-element/</url>
