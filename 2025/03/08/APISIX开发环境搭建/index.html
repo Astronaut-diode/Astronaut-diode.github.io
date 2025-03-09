@@ -1,0 +1,778 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/bg/favicon.png">
+  <link rel="icon" href="/img/bg/favicon.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="锋">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="APISIX的开发环境搭建过程，从安装到运行。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="APISIX开发环境搭建">
+<meta property="og:url" content="https://astronaut-diode.github.io/2025/03/08/APISIX%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/index.html">
+<meta property="og:site_name" content="锋的博客">
+<meta property="og:description" content="APISIX的开发环境搭建过程，从安装到运行。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-03-08T02:10:37.000Z">
+<meta property="article:modified_time" content="2025-03-09T12:59:05.345Z">
+<meta property="article:author" content="锋">
+<meta property="article:tag" content="环境安装">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>APISIX开发环境搭建 - 锋的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"astronaut-diode.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"left","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>锋的博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bg/blog_banner_background.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="APISIX开发环境搭建"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        锋
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-03-08 10:10" pubdate>
+          星期六, 三月 8日 2025, 10:10 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          1.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          11 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="padding-left: 2rem; margin-right: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">APISIX开发环境搭建</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="apisix开发环境搭建全过程">APISIX开发环境搭建全过程</h1>
+<h2 id="安装amd环境">1 安装amd环境</h2>
+<p>在虚拟机上安装ubuntu 22.04.5版本的amd环境，镜像可从<a
+target="_blank" rel="noopener" href="https://mirrors.tuna.tsinghua.edu.cn/ubuntu-releases/22.04.4/ubuntu-22.04.5-desktop-amd64.iso">清华大学开源软件镜像站</a>下载。</p>
+<h2 id="源码安装apisix">2 源码安装APISIX</h2>
+<h3 id="安装etcd">2.1 安装etcd</h3>
+<p>在虚拟机上安装架构为amd，版本为3.5.19的etcd，二进制代码包可从<a
+target="_blank" rel="noopener" href="https://github.com/etcd-io/etcd/releases/download/v3.5.19/etcd-v3.5.19-linux-amd64.tar.gz">etcd</a>下载，直接解压缩即可使用。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash">tar -zxvf etcd-v3.5.19-linux-amd64.tar.gz -C <span class="hljs-variable">$HOME</span>/apps/ &amp;&amp; <span class="hljs-built_in">mv</span> <span class="hljs-variable">$HOME</span>/apps/etcd-v3.5.19-linux-amd64/ <span class="hljs-variable">$HOME</span>/apps/etcd/ &amp;&amp; <span class="hljs-built_in">cd</span> <span class="hljs-variable">$HOME</span>/apps/etcd/ <span class="hljs-comment"># 解压缩etcd的二进制包</span><br><span class="hljs-comment"># 编辑$HOME/.bashrc,设置环境变量</span><br>vim <span class="hljs-variable">$HOME</span>/.bashrc<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$HOME</span>/apps/etcd <span class="hljs-comment"># etcd、etcdctl等二进制文件的目录</span><br><br><span class="hljs-built_in">source</span> <span class="hljs-variable">$HOME</span>/.bashrc <span class="hljs-comment"># 激活环境变量</span><br>etcd <span class="hljs-comment"># 验证etcd是否安装完成</span><br></code></pre></td></tr></table></figure>
+<h3 id="安装go">2.2 安装Go</h3>
+<p>在虚拟机上安装架构为amd，版本为1.24.1的Go环境，二进制代码包可从<a
+target="_blank" rel="noopener" href="https://go.dev/dl/go1.24.1.linux-amd64.tar.gz">Go</a>下载。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">tar -zxvf go1.24.1.linux-amd64.tar.gz -C <span class="hljs-variable">$HOME</span>/apps &amp;&amp; <span class="hljs-built_in">cd</span> <span class="hljs-variable">$HOME</span>/apps/go/ <span class="hljs-comment"># 解压缩Go的二进制包</span><br><span class="hljs-comment"># 编辑$HOME/.bashrc,设置环境变量</span><br>vim <span class="hljs-variable">$HOME</span>/.bashrc<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$HOME</span>/apps/go/bin <span class="hljs-comment"># 设置go的二进制文件路径</span><br><span class="hljs-built_in">export</span> GOPATH=<span class="hljs-variable">$HOME</span>/apps/gopath <span class="hljs-comment"># 设置go的工作空间</span><br><br><span class="hljs-built_in">source</span> <span class="hljs-variable">$HOME</span>/.bashrc <span class="hljs-comment"># 激活环境变量</span><br>go <span class="hljs-built_in">env</span> -w GOPROXY=https://goproxy.cn,direct <span class="hljs-comment"># 设置go下载第三方库的时候使用的代理地址</span><br>go version <span class="hljs-comment"># 验证go环境是否安装完成</span><br></code></pre></td></tr></table></figure>
+<h3 id="安装apisix-dashboard">2.3 安装APISIX Dashboard</h3>
+<h4 id="安装node.js与yarn">2.3.1 安装Node.js与yarn</h4>
+<p>在虚拟机上安装架构为x64，版本为16.20.2的node.js，版本为8.19.4的npm，二进制代码包可以从<a
+target="_blank" rel="noopener" href="https://nodejs.org/dist/v16.20.2/node-v16.20.2-linux-x64.tar.xz">node.js</a>下载。接着用npm安装1.22.22版本的yarn。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">tar -xvf node-v16.20.2-linux-x64.tar.xz -C <span class="hljs-variable">$HOME</span>/apps &amp;&amp; <span class="hljs-built_in">mv</span> <span class="hljs-variable">$HOME</span>/apps/node-v16.20.2-linux-x64/ <span class="hljs-variable">$HOME</span>/apps/nodejs/ &amp;&amp; <span class="hljs-built_in">cd</span> <span class="hljs-variable">$HOME</span>/apps/nodejs <span class="hljs-comment"># 解压缩nodejs的二进制包</span><br><span class="hljs-comment"># 编辑$HOME/.bashrc,设置环境变量</span><br>vim <span class="hljs-variable">$HOME</span>/.bashrc<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$HOME</span>/apps/nodejs/bin <span class="hljs-comment"># 设置node.js和npm的二进制文件路径</span><br><br><span class="hljs-built_in">source</span> <span class="hljs-variable">$HOME</span>/.bashrc <span class="hljs-comment"># 激活环境变量</span><br>node -v<br>npm -v <span class="hljs-comment"># 验证node.js是否安装完成</span><br>npm install -g yarn<br>yarn --version <span class="hljs-comment"># 验证yarn是否安装完成</span><br></code></pre></td></tr></table></figure>
+<h4 id="安装dashboard">2.3.2 安装Dashboard</h4>
+<p>在虚拟机上安装架构为amd，版本为2.15.0的Dashboard，源码包可从<a
+target="_blank" rel="noopener" href="https://codeload.github.com/apache/apisix-dashboard/tar.gz/refs/tags/v2.15.0">Dashboard</a>下载。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash">tar -zxvf apisix-dashboard-2.15.0.tar.gz -C <span class="hljs-variable">$HOME</span>/apps/ &amp;&amp; <span class="hljs-built_in">mv</span> <span class="hljs-variable">$HOME</span>/apps/apisix-dashboard-2.15.0/ <span class="hljs-variable">$HOME</span>/apps/dashboard/ &amp;&amp; <span class="hljs-built_in">cd</span> <span class="hljs-variable">$HOME</span>/apps/dashboard/ <span class="hljs-comment"># 解压Dashboard的源码包</span><br>make build <span class="hljs-comment"># 执行Dashboard的安装脚本,将会得到output的编译文件夹,这一步可能会等待的时间非常久</span><br><br><span class="hljs-comment"># 编辑$HOME/.bashrc,设置环境变量</span><br>vim <span class="hljs-variable">$HOME</span>/.bashrc<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$HOME</span>/apps/dashboard/output <span class="hljs-comment"># 设置Dashboard的环境变量</span><br><br><span class="hljs-built_in">source</span> <span class="hljs-variable">$HOME</span>/.bashrc <span class="hljs-comment"># 激活环境变量</span><br>manager-api -p output/ <span class="hljs-comment"># 启动Dashboard，之后便可在127.0.0.1:9000端口访问Dashboard</span><br></code></pre></td></tr></table></figure>
+<h3 id="安装apisix">2.4 安装APISIX</h3>
+<h4 id="安装openssl">2.4.1 安装openssl</h4>
+<p>在虚拟机上安装版本为1.1.1w的openssl，源码包可以从<a
+target="_blank" rel="noopener" href="https://objects.githubusercontent.com/github-production-release-asset-2e65be/7634677/b4c6e1f3-d928-4de0-a502-fc8dae2adf1e?X-Amz-Algorithm=AWS4-HMAC-SHA256&amp;X-Amz-Credential=releaseassetproduction%2F20250309%2Fus-east-1%2Fs3%2Faws4_request&amp;X-Amz-Date=20250309T052842Z&amp;X-Amz-Expires=300&amp;X-Amz-Signature=898858f7eb5d4f953023a2f8f4fc8f7a5149d2b9ceb502b7f68afe66401caeb3&amp;X-Amz-SignedHeaders=host&amp;response-content-disposition=attachment%3B%20filename%3Dopenssl-1.1.1w.tar.gz&amp;response-content-type=application%2Foctet-stream">openssl</a>下载。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">tar -zxvf openssl-1.1.1w.tar.gz -C <span class="hljs-variable">$HOME</span>/apps/ &amp;&amp; tar -zxvf openresty-1.21.4.1.tar.gz -C <span class="hljs-variable">$HOME</span>/apps/ &amp;&amp; <span class="hljs-built_in">mv</span> <span class="hljs-variable">$HOME</span>/apps/openresty-1.21.4.1/ <span class="hljs-variable">$HOME</span>/apps/openresty/ &amp;&amp; <span class="hljs-built_in">cd</span> <span class="hljs-variable">$HOME</span>/apps/openssl-1.1.1w/ <span class="hljs-comment"># 解压缩openssl、openresty的源码包。</span><br><span class="hljs-built_in">sudo</span> apt install git gcc g++ libpcre3 libpcre3-dev libssl-dev zlib1g-dev libldap2-dev <span class="hljs-comment"># 安装所需的编译依赖</span><br>./config --prefix=<span class="hljs-variable">$HOME</span>/apps/openresty/openssl --openssldir=<span class="hljs-variable">$HOME</span>/apps/openresty/openssl <span class="hljs-comment"># 编译安装openssl，会将编译的文件生成到openresty文件夹中</span><br>make -j$(<span class="hljs-built_in">nproc</span>)<br>make install<br></code></pre></td></tr></table></figure>
+<h4 id="安装openresty">2.4.2 安装OpenResty</h4>
+<p>在虚拟机上安装版本为1.21.4.1的OpenResty，源码包可以从<a
+target="_blank" rel="noopener" href="https://openresty.org/download/openresty-1.21.4.1.tar.gz">OpenResty</a>下载。后续如果需要对nginx的源码做出修改，有以下两种方式。</p>
+<ul>
+<li>修改$HOME/apps/openresty/build/nginx/src中的代码，执行configure和两个make即可生效。</li>
+<li>修改$HOME/app/openresty/bundle/nginx/src中的代码，执行两个make即可生效。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cd</span> <span class="hljs-variable">$HOME</span>/apps/openresty/ <span class="hljs-comment"># 解压缩Openresty的源码包</span><br>./configure --prefix=<span class="hljs-variable">$HOME</span>/apps/openresty \<br>	--with-openssl=<span class="hljs-variable">$HOME</span>/apps/openssl-1.1.1w/ \<br>	--with-http_realip_module \<br>    --with-http_v2_module \<br>    --with-http_ssl_module \<br>    --with-http_stub_status_module <span class="hljs-comment"># 编译安装，并设定目标目录，以及openssl的源码目录，准备编译完成以后静态链接。# 编译安装，并设定目标目录，以及openssl的源码目录，准备编译完成以后静态链接。</span><br>make -j$(<span class="hljs-built_in">nproc</span>)<br>make install<br><br><span class="hljs-comment"># 编辑$HOME/.bashrc,设置环境变量</span><br>vim <span class="hljs-variable">$HOME</span>/.bashrc<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$HOME</span>/apps/openresty/bin<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$HOME</span>/apps/openresty/luajit/bin <span class="hljs-comment"># 设置oprensty和luajit的环境变量</span><br><br><span class="hljs-built_in">source</span> <span class="hljs-variable">$HOME</span>/.bashrc <span class="hljs-comment"># 激活环境变量</span><br><span class="hljs-built_in">which</span> openresty<br><span class="hljs-built_in">which</span> luajit <span class="hljs-comment"># 验证openresty和luajit是否安装完成</span><br></code></pre></td></tr></table></figure>
+<h4 id="安装luarocks">2.4.3 安装luarocks</h4>
+<p>在虚拟机上安装版本为3.9.2的luarocks，源码包可以从<a
+target="_blank" rel="noopener" href="https://luarocks.github.io/luarocks/releases/luarocks-3.9.2.tar.gz">luarocks</a>下载。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs bash">tar -zxvf luarocks-3.9.2.tar.gz -C <span class="hljs-variable">$HOME</span>/apps/ &amp;&amp; <span class="hljs-built_in">mv</span> <span class="hljs-variable">$HOME</span>/apps/luarocks-3.9.2/ <span class="hljs-variable">$HOME</span>/apps/luarocks/ &amp;&amp; <span class="hljs-built_in">cd</span> <span class="hljs-variable">$HOME</span>/apps/luarocks <span class="hljs-comment"># 解压缩luarocks的源码包。</span><br>./configure --prefix=<span class="hljs-variable">$HOME</span>/apps/luarocks --with-lua=<span class="hljs-variable">$HOME</span>/apps/openresty/luajit/<br>make -j$(<span class="hljs-built_in">nproc</span>)<br>make install<br><br><span class="hljs-comment"># 编辑$HOME/.bashrc,设置环境变量</span><br>vim <span class="hljs-variable">$HOME</span>/.bashrc<br><span class="hljs-built_in">export</span> PATH=<span class="hljs-variable">$PATH</span>:<span class="hljs-variable">$HOME</span>/apps/luarocks/bin <span class="hljs-comment"># 设置luarocks的环境变量</span><br><br><span class="hljs-built_in">source</span> <span class="hljs-variable">$HOME</span>/.bashrc <span class="hljs-comment"># 激活环境变量</span><br><span class="hljs-built_in">which</span> luarocks <span class="hljs-comment"># 验证luarocks是否安装完成</span><br></code></pre></td></tr></table></figure>
+<h4 id="安装apisix-1">2.4.4 安装APISIX</h4>
+<p>在虚拟机上安装版本为2.15.0的APISIX，源码包可以从<a
+target="_blank" rel="noopener" href="https://codeload.github.com/apache/apisix/tar.gz/refs/tags/2.15.0">APISIX</a>下载。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">tar -zxvf apisix-2.15.0.tar.gz -C <span class="hljs-variable">$HOME</span>/apps/ &amp;&amp; <span class="hljs-built_in">mv</span> <span class="hljs-variable">$HOME</span>/apps/apisix-2.15.0/ <span class="hljs-variable">$HOME</span>/apps/apisix/ &amp;&amp; <span class="hljs-built_in">cd</span> <span class="hljs-variable">$HOME</span>/apps/apisix/ <span class="hljs-comment"># 解压缩APISIX的源码包</span><br><span class="hljs-comment"># 修改rockspec/apisix-master-0.rockspec文件中的版本配置</span><br><span class="hljs-comment"># &quot;lualdap = 1.2.6-1&quot;  ===&gt;  &quot;lualdap = 1.4.0&quot;</span><br>sed -i <span class="hljs-string">&#x27;s/&quot;lualdap = 1\.2\.6-1&quot;/&quot;lualdap = 1.4.0&quot;/g&#x27;</span> rockspec/apisix-master-0.rockspec <br>make deps <span class="hljs-comment"># 源码编译，安装依赖。此时APISIX已经可以启动了。</span><br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/APISIX/" class="category-chain-item">APISIX</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%8E%AF%E5%A2%83%E5%AE%89%E8%A3%85/" class="print-no-link">#环境安装</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>APISIX开发环境搭建</div>
+      <div>https://astronaut-diode.github.io/2025/03/08/APISIX开发环境搭建/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>锋</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年3月8日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/12/23/Leetcode-search-insert-position/" title="search-insert-position">
+                        <span class="hidden-mobile">search-insert-position</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'Astronaut-diode/Astronaut-diode.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar category-bar" style="margin-left: -1rem">
+    
+
+
+
+
+
+<div class="category-list">
+  
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item 
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="APISIX"
+        id="heading-ff5934d6e8fde57f7bbd15009e71e196" role="tab" data-toggle="collapse" href="#collapse-ff5934d6e8fde57f7bbd15009e71e196"
+        aria-expanded="true"
+      >
+        APISIX
+        <span class="list-group-count">(1)</span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+      <div class="category-collapse collapse show" id="collapse-ff5934d6e8fde57f7bbd15009e71e196"
+           role="tabpanel" aria-labelledby="heading-ff5934d6e8fde57f7bbd15009e71e196">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/2025/03/08/APISIX%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" title="APISIX开发环境搭建"
+           class="list-group-item list-group-item-action
+           active">
+          <span class="category-post">APISIX开发环境搭建</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+</div>
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
