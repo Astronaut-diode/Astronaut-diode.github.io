@@ -26,13 +26,13 @@
 <meta property="og:site_name" content="锋的博客">
 <meta property="og:description" content="APISIX的开发环境搭建过程，从安装到运行。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="d:\Mark\Blog\source\img\capture\1741526562739.png">
+<meta property="og:image" content="https://astronaut-diode.github.io/2025/03/08/img/capture/1741526562739-1741527127408-2.png">
 <meta property="article:published_time" content="2025-03-08T02:10:37.000Z">
-<meta property="article:modified_time" content="2025-03-09T13:22:57.247Z">
+<meta property="article:modified_time" content="2025-03-09T13:32:12.310Z">
 <meta property="article:author" content="锋">
 <meta property="article:tag" content="环境安装">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="d:\Mark\Blog\source\img\capture\1741526562739.png">
+<meta name="twitter:image" content="https://astronaut-diode.github.io/2025/03/08/img/capture/1741526562739-1741527127408-2.png">
   
   
   
@@ -346,7 +346,7 @@ target="_blank" rel="noopener" href="https://luarocks.github.io/luarocks/release
 target="_blank" rel="noopener" href="https://codeload.github.com/apache/apisix/tar.gz/refs/tags/2.15.0">APISIX</a>下载。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash">tar -zxvf apisix-2.15.0.tar.gz -C <span class="hljs-variable">$HOME</span>/apps/ &amp;&amp; <span class="hljs-built_in">mv</span> <span class="hljs-variable">$HOME</span>/apps/apisix-2.15.0/ <span class="hljs-variable">$HOME</span>/apps/apisix/ &amp;&amp; <span class="hljs-built_in">cd</span> <span class="hljs-variable">$HOME</span>/apps/apisix/ <span class="hljs-comment"># 解压缩APISIX的源码包</span><br><span class="hljs-comment"># 修改rockspec/apisix-master-0.rockspec文件中的版本配置</span><br><span class="hljs-comment"># &quot;lualdap = 1.2.6-1&quot;  ===&gt;  &quot;lualdap = 1.4.0&quot;</span><br>sed -i <span class="hljs-string">&#x27;s/&quot;lualdap = 1\.2\.6-1&quot;/&quot;lualdap = 1.4.0&quot;/g&#x27;</span> rockspec/apisix-master-0.rockspec <br>make deps <span class="hljs-comment"># 源码编译，安装依赖。此时APISIX已经可以启动了。</span><br></code></pre></td></tr></table></figure>
 <figure>
-<img src="D:\Mark\Blog\source\img\capture\1741526562739.png" srcset="/img/loading.gif" lazyload
+<img src="../img/capture/1741526562739-1741527127408-2.png" srcset="/img/loading.gif" lazyload
 alt="1741526562739" />
 <figcaption aria-hidden="true">1741526562739</figcaption>
 </figure>
