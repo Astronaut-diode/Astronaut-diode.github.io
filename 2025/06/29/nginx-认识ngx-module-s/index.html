@@ -1,0 +1,789 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/bg/favicon.png">
+  <link rel="icon" href="/img/bg/favicon.png">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="锋">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="认识nginx内部的module分类，以及学习ngx_module_s。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nginx-认识ngx_module_s">
+<meta property="og:url" content="https://astronaut-diode.github.io/2025/06/29/nginx-%E8%AE%A4%E8%AF%86ngx-module-s/index.html">
+<meta property="og:site_name" content="锋的博客">
+<meta property="og:description" content="认识nginx内部的module分类，以及学习ngx_module_s。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-06-29T03:54:40.000Z">
+<meta property="article:modified_time" content="2025-06-29T03:56:32.031Z">
+<meta property="article:author" content="锋">
+<meta property="article:tag" content="nginx源码分析">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>nginx-认识ngx_module_s - 锋的博客</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"astronaut-diode.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"left","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":6},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 100vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>锋的博客</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/bg/blog_banner_background.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="nginx-认识ngx_module_s"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-author" aria-hidden="true"></i>
+        锋
+      </span>
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-06-29 11:54" pubdate>
+          星期日, 六月 29日 2025, 11:54 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          <!-- compatible with older versions-->
+          934 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          <!-- compatible with older versions-->
+          8 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+        <div class="scroll-down-bar">
+          <i class="iconfont icon-arrowdown"></i>
+        </div>
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="padding-left: 2rem; margin-right: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">nginx-认识ngx_module_s</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1 id="nginx中模块和module的关系">1. nginx中模块和module的关系</h1>
+<p>在nginx当中存在一共分5类重要模块，核心模块、HTTP模块、Event模块、Mail模块还有配置模块。而一个模块中，可能分为多个类别的module，每一类module又可以细分为多种实现。</p>
+<p>在核心模块中包含了六个module，分别是ngx_core_module、ngx_errlog_module、ngx_openssl_module、ngx_http_module、ngx_events_module、ngx_mail_module。其中ngx_http_module、ngx_events_module、ngx_mail_module是其他三大模块的核心骨架，但是基础创建的时候使用的依然是ngx_core_module_t，所以将其归结在核心模块中。</p>
+<p>HTTP模块中，主要是从ngx_http_module拓展出来的。</p>
+<p>Event模块中，主要是从ngx_events_module拓展出来的。</p>
+<p>Mail模块中，主要是从ngx_mail_module拓展出来的。</p>
+<p>配置模块中，主要的module是ngx_conf_module。</p>
+<h2 id="模块接口结构体ngx_module_s">1.1 模块接口结构体ngx_module_s</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ngx_module_s</span> &#123;</span><br>    <span class="hljs-type">ngx_uint_t</span>            ctx_index;<br>    <span class="hljs-type">ngx_uint_t</span>            index;<br>    <span class="hljs-type">char</span>                 *name;<br>    <span class="hljs-type">ngx_uint_t</span>            spare0;<br>    <span class="hljs-type">ngx_uint_t</span>            spare1;<br>    <span class="hljs-type">ngx_uint_t</span>            version;<br>    <span class="hljs-type">const</span> <span class="hljs-type">char</span>           *signature;<br>    <span class="hljs-type">void</span>                 *ctx; <span class="hljs-comment">// 用于区分当前module属于哪个模块。</span><br>    <span class="hljs-type">ngx_command_t</span>        *commands;<br>    <span class="hljs-type">ngx_uint_t</span>            type;<br><br>    <span class="hljs-type">ngx_int_t</span>           (*init_master)(<span class="hljs-type">ngx_log_t</span> *<span class="hljs-built_in">log</span>);<br>    <span class="hljs-type">ngx_int_t</span>           (*init_module)(<span class="hljs-type">ngx_cycle_t</span> *cycle);<br>    <span class="hljs-type">ngx_int_t</span>           (*init_process)(<span class="hljs-type">ngx_cycle_t</span> *cycle);<br>    <span class="hljs-type">ngx_int_t</span>           (*init_thread)(<span class="hljs-type">ngx_cycle_t</span> *cycle);<br>    <span class="hljs-type">void</span>                (*exit_thread)(<span class="hljs-type">ngx_cycle_t</span> *cycle);<br>    <span class="hljs-type">void</span>                (*exit_process)(<span class="hljs-type">ngx_cycle_t</span> *cycle);<br>    <span class="hljs-type">void</span>                (*exit_master)(<span class="hljs-type">ngx_cycle_t</span> *cycle);<br><br>    <span class="hljs-type">uintptr_t</span>             spare_hook0;<br>    <span class="hljs-type">uintptr_t</span>             spare_hook1;<br>    <span class="hljs-type">uintptr_t</span>             spare_hook2;<br>    <span class="hljs-type">uintptr_t</span>             spare_hook3;<br>    <span class="hljs-type">uintptr_t</span>             spare_hook4;<br>    <span class="hljs-type">uintptr_t</span>             spare_hook5;<br>    <span class="hljs-type">uintptr_t</span>             spare_hook6;<br>    <span class="hljs-type">uintptr_t</span>             spare_hook7;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>ngx_module_s包含了一个module的基本信息，作为所有module的公共父类，所有的module都是用这个结构体构建的，并且会通过**void
+*ctx**区分属于哪个模块里面的哪一类module。</p>
+<h3 id="核心模块module使用的ctx">1.1.1 核心模块module使用的ctx</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>    <span class="hljs-type">ngx_str_t</span>           name;<br>    <span class="hljs-type">void</span>               *(*create_conf)(<span class="hljs-type">ngx_cycle_t</span> *cycle);<br>    <span class="hljs-type">char</span>               *(*init_conf)(<span class="hljs-type">ngx_cycle_t</span> *cycle, <span class="hljs-type">void</span> *conf);<br>&#125; <span class="hljs-type">ngx_core_module_t</span>;<br></code></pre></td></tr></table></figure>
+<p>当创建的ngx_module_s.ctx的内容为ngx_core_module_t类型的内容时，其表示的内容就是ngx_core_module下派生的module子类。以下三类module使用的都是ngx_core_module_t，也代表他们都是属于核心模块。</p>
+<h4 id="ngx_core_module">1.1.1.1 ngx_core_module</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">ngx_core_module_t</span>  ngx_core_module_ctx = &#123;<br>    ngx_string(<span class="hljs-string">&quot;core&quot;</span>),<br>    ngx_core_module_create_conf,<br>    ngx_core_module_init_conf<br>&#125;;<br><br><span class="hljs-type">ngx_module_t</span>  ngx_core_module = &#123;<br>    NGX_MODULE_V1,<br>    &amp;ngx_core_module_ctx,                  <span class="hljs-comment">/* module context */</span><br>    ngx_core_commands,                     <span class="hljs-comment">/* module directives */</span><br>    NGX_CORE_MODULE,                       <span class="hljs-comment">/* module type */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init master */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init module */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init process */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init thread */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit thread */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit process */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit master */</span><br>    NGX_MODULE_V1_PADDING<br>&#125;;<br></code></pre></td></tr></table></figure>
+<h4 id="ngx_errlog_module">1.1.1.2 ngx_errlog_module</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">ngx_core_module_t</span>  ngx_errlog_module_ctx = &#123;<br>    ngx_string(<span class="hljs-string">&quot;errlog&quot;</span>),<br>    <span class="hljs-literal">NULL</span>,<br>    <span class="hljs-literal">NULL</span><br>&#125;;<br><br><span class="hljs-type">ngx_module_t</span>  ngx_errlog_module = &#123;<br>    NGX_MODULE_V1,<br>    &amp;ngx_errlog_module_ctx,                <span class="hljs-comment">/* module context */</span><br>    ngx_errlog_commands,                   <span class="hljs-comment">/* module directives */</span><br>    NGX_CORE_MODULE,                       <span class="hljs-comment">/* module type */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init master */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init module */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init process */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init thread */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit thread */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit process */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit master */</span><br>    NGX_MODULE_V1_PADDING<br>&#125;;<br></code></pre></td></tr></table></figure>
+<h4 id="ngx_openssl_module">1.1.1.3 ngx_openssl_module</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">ngx_core_module_t</span>  ngx_openssl_module_ctx = &#123;<br>    ngx_string(<span class="hljs-string">&quot;openssl&quot;</span>),<br>    ngx_openssl_create_conf,<br>    <span class="hljs-literal">NULL</span><br>&#125;;<br><br><span class="hljs-type">ngx_module_t</span>  ngx_openssl_module = &#123;<br>    NGX_MODULE_V1,<br>    &amp;ngx_openssl_module_ctx,               <span class="hljs-comment">/* module context */</span><br>    ngx_openssl_commands,                  <span class="hljs-comment">/* module directives */</span><br>    NGX_CORE_MODULE,                       <span class="hljs-comment">/* module type */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init master */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init module */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init process */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init thread */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit thread */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit process */</span><br>    ngx_openssl_exit,                      <span class="hljs-comment">/* exit master */</span><br>    NGX_MODULE_V1_PADDING<br>&#125;;<br></code></pre></td></tr></table></figure>
+<h4 id="ngx_http_module">1.1.1.4 ngx_http_module</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">ngx_core_module_t</span>  ngx_http_module_ctx = &#123;<br>    ngx_string(<span class="hljs-string">&quot;http&quot;</span>),<br>    <span class="hljs-literal">NULL</span>,<br>    <span class="hljs-literal">NULL</span><br>&#125;;<br><br><span class="hljs-type">ngx_module_t</span>  ngx_http_module = &#123;<br>    NGX_MODULE_V1,<br>    &amp;ngx_http_module_ctx,                  <span class="hljs-comment">/* module context */</span><br>    ngx_http_commands,                     <span class="hljs-comment">/* module directives */</span><br>    NGX_CORE_MODULE,                       <span class="hljs-comment">/* module type */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init master */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init module */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init process */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init thread */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit thread */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit process */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit master */</span><br>    NGX_MODULE_V1_PADDING<br>&#125;;<br></code></pre></td></tr></table></figure>
+<h4 id="ngx_events_module">1.1.1.5 ngx_events_module</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">ngx_core_module_t</span>  ngx_events_module_ctx = &#123;<br>    ngx_string(<span class="hljs-string">&quot;events&quot;</span>),<br>    <span class="hljs-literal">NULL</span>,<br>    ngx_event_init_conf<br>&#125;;<br><br><span class="hljs-type">ngx_module_t</span>  ngx_events_module = &#123;<br>    NGX_MODULE_V1,<br>    &amp;ngx_events_module_ctx,                <span class="hljs-comment">/* module context */</span><br>    ngx_events_commands,                   <span class="hljs-comment">/* module directives */</span><br>    NGX_CORE_MODULE,                       <span class="hljs-comment">/* module type */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init master */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init module */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init process */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init thread */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit thread */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit process */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit master */</span><br>    NGX_MODULE_V1_PADDING<br>&#125;;<br></code></pre></td></tr></table></figure>
+<h4 id="ngx_mail_module">1.1.1.6 ngx_mail_module</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">static</span> <span class="hljs-type">ngx_core_module_t</span>  ngx_mail_module_ctx = &#123;<br>    ngx_string(<span class="hljs-string">&quot;mail&quot;</span>),<br>    <span class="hljs-literal">NULL</span>,<br>    <span class="hljs-literal">NULL</span><br>&#125;;<br><br><span class="hljs-type">ngx_module_t</span>  ngx_mail_module = &#123;<br>    NGX_MODULE_V1,<br>    &amp;ngx_mail_module_ctx,                  <span class="hljs-comment">/* module context */</span><br>    ngx_mail_commands,                     <span class="hljs-comment">/* module directives */</span><br>    NGX_CORE_MODULE,                       <span class="hljs-comment">/* module type */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init master */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init module */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init process */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init thread */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit thread */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit process */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit master */</span><br>    NGX_MODULE_V1_PADDING<br>&#125;;<br><br></code></pre></td></tr></table></figure>
+<h3 id="http模块module使用的ctx">1.1.2 HTTP模块module使用的ctx</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>    <span class="hljs-type">ngx_int_t</span>   (*preconfiguration)(<span class="hljs-type">ngx_conf_t</span> *cf);<br>    <span class="hljs-type">ngx_int_t</span>   (*postconfiguration)(<span class="hljs-type">ngx_conf_t</span> *cf);<br><br>    <span class="hljs-type">void</span>       *(*create_main_conf)(<span class="hljs-type">ngx_conf_t</span> *cf);<br>    <span class="hljs-type">char</span>       *(*init_main_conf)(<span class="hljs-type">ngx_conf_t</span> *cf, <span class="hljs-type">void</span> *conf);<br><br>    <span class="hljs-type">void</span>       *(*create_srv_conf)(<span class="hljs-type">ngx_conf_t</span> *cf);<br>    <span class="hljs-type">char</span>       *(*merge_srv_conf)(<span class="hljs-type">ngx_conf_t</span> *cf, <span class="hljs-type">void</span> *prev, <span class="hljs-type">void</span> *conf);<br><br>    <span class="hljs-type">void</span>       *(*create_loc_conf)(<span class="hljs-type">ngx_conf_t</span> *cf);<br>    <span class="hljs-type">char</span>       *(*merge_loc_conf)(<span class="hljs-type">ngx_conf_t</span> *cf, <span class="hljs-type">void</span> *prev, <span class="hljs-type">void</span> *conf);<br>&#125; <span class="hljs-type">ngx_http_module_t</span>;<br></code></pre></td></tr></table></figure>
+<p>当创建的ngx_module_s.ctx的内容为ngx_http_module_t类型的内容时，其表示的内容就是ngx_http_module下派生的module子类。</p>
+<h3 id="event模块module使用的ctx">1.1.3 event模块module使用的ctx</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>    <span class="hljs-type">ngx_str_t</span>              *name;<br><br>    <span class="hljs-type">void</span>                 *(*create_conf)(<span class="hljs-type">ngx_cycle_t</span> *cycle);<br>    <span class="hljs-type">char</span>                 *(*init_conf)(<span class="hljs-type">ngx_cycle_t</span> *cycle, <span class="hljs-type">void</span> *conf);<br><br>    <span class="hljs-type">ngx_event_actions_t</span>     actions;<br>&#125; <span class="hljs-type">ngx_event_module_t</span>;<br></code></pre></td></tr></table></figure>
+<p>当创建的ngx_module_s.ctx的内容为ngx_event_module_t类型的内容时，其表示的内容就是ngx_event_module下派生的module子类。</p>
+<h3 id="mail模块module使用的ctx">1.1.4 mail模块module使用的ctx</h3>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>    <span class="hljs-type">ngx_mail_protocol_t</span>        *protocol;<br><br>    <span class="hljs-type">void</span>                       *(*create_main_conf)(<span class="hljs-type">ngx_conf_t</span> *cf);<br>    <span class="hljs-type">char</span>                       *(*init_main_conf)(<span class="hljs-type">ngx_conf_t</span> *cf, <span class="hljs-type">void</span> *conf);<br><br>    <span class="hljs-type">void</span>                       *(*create_srv_conf)(<span class="hljs-type">ngx_conf_t</span> *cf);<br>    <span class="hljs-type">char</span>                       *(*merge_srv_conf)(<span class="hljs-type">ngx_conf_t</span> *cf, <span class="hljs-type">void</span> *prev,<br>                                                  <span class="hljs-type">void</span> *conf);<br>&#125; <span class="hljs-type">ngx_mail_module_t</span>;<br></code></pre></td></tr></table></figure>
+<p>当创建的ngx_module_s.ctx的内容为ngx_mail_module_t类型的内容时，其表示的内容就是ngx_mail_module下派生的module子类。</p>
+<h3 id="配置模块module使用的ctx">1.1.5 配置模块module使用的ctx</h3>
+<p>处于惯性思维，可能认为配置模块的module也会使用ngx_conf_module_t作为ctx的结构体类型，但是实际上并没有这个结构体类型，而ngx_conf_module的ctx内容是空的，所以是单独被列为了一类模块。</p>
+<h4 id="ngx_conf_module">1.1.5.1 ngx_conf_module</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">ngx_module_t</span>  ngx_conf_module = &#123;<br>    NGX_MODULE_V1,<br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* module context */</span><br>    ngx_conf_commands,                     <span class="hljs-comment">/* module directives */</span><br>    NGX_CONF_MODULE,                       <span class="hljs-comment">/* module type */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init master */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init module */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init process */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* init thread */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit thread */</span><br>    ngx_conf_flush_files,                  <span class="hljs-comment">/* exit process */</span><br>    <span class="hljs-literal">NULL</span>,                                  <span class="hljs-comment">/* exit master */</span><br>    NGX_MODULE_V1_PADDING<br>&#125;;<br></code></pre></td></tr></table></figure>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/NGINX/" class="category-chain-item">NGINX</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/nginx%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" class="print-no-link">#nginx源码分析</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>nginx-认识ngx_module_s</div>
+      <div>https://astronaut-diode.github.io/2025/06/29/nginx-认识ngx-module-s/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>锋</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年6月29日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/06/29/nginx-%E5%86%85%E5%AD%98%E6%B1%A0/" title="nginx-内存池">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">nginx-内存池</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/03/08/APISIX%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" title="APISIX开发环境搭建">
+                        <span class="hidden-mobile">APISIX开发环境搭建</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#comments', function() {
+      var light = 'github-light';
+      var dark = 'github-dark';
+      var schema = document.documentElement.getAttribute('data-user-color-scheme');
+      if (schema === 'dark') {
+        schema = dark;
+      } else {
+        schema = light;
+      }
+      window.UtterancesThemeLight = light;
+      window.UtterancesThemeDark = dark;
+      var s = document.createElement('script');
+      s.setAttribute('src', 'https://utteranc.es/client.js');
+      s.setAttribute('repo', 'Astronaut-diode/Astronaut-diode.github.io');
+      s.setAttribute('issue-term', 'pathname');
+      
+      s.setAttribute('label', 'utterances');
+      
+      s.setAttribute('theme', schema);
+      s.setAttribute('crossorigin', 'anonymous');
+      document.getElementById('comments').appendChild(s);
+    })
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar category-bar" style="margin-left: -1rem">
+    
+
+
+
+
+
+<div class="category-list">
+  
+  
+    
+    
+    
+    <div class="category row nomargin-x">
+      <a class="category-item 
+          list-group-item category-item-action col-10 col-md-11 col-xm-11" title="NGINX"
+        id="heading-b909e8d0076fcb762542a045c5a3bea7" role="tab" data-toggle="collapse" href="#collapse-b909e8d0076fcb762542a045c5a3bea7"
+        aria-expanded="true"
+      >
+        NGINX
+        <span class="list-group-count">(2)</span>
+        <i class="iconfont icon-arrowright"></i>
+      </a>
+      
+      <div class="category-collapse collapse show" id="collapse-b909e8d0076fcb762542a045c5a3bea7"
+           role="tabpanel" aria-labelledby="heading-b909e8d0076fcb762542a045c5a3bea7">
+        
+        
+          
+  <div class="category-post-list">
+    
+    
+      
+      
+        <a href="/2025/06/29/nginx-%E5%86%85%E5%AD%98%E6%B1%A0/" title="nginx-内存池"
+           class="list-group-item list-group-item-action
+           ">
+          <span class="category-post">nginx-内存池</span>
+        </a>
+      
+    
+      
+      
+        <a href="/2025/06/29/nginx-%E8%AE%A4%E8%AF%86ngx-module-s/" title="nginx-认识ngx_module_s"
+           class="list-group-item list-group-item-action
+           active">
+          <span class="category-post">nginx-认识ngx_module_s</span>
+        </a>
+      
+    
+  </div>
+
+        
+      </div>
+    </div>
+  
+</div>
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
