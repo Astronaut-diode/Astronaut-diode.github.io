@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://astronaut-diode.github.io/img/capture/image-20250629112920066.png">
 <meta property="article:published_time" content="2025-06-29T03:57:00.000Z">
-<meta property="article:modified_time" content="2025-07-17T14:46:42.887Z">
+<meta property="article:modified_time" content="2025-07-25T12:58:25.688Z">
 <meta property="article:author" content="锋">
 <meta property="article:tag" content="nginx源码分析">
 <meta name="twitter:card" content="summary_large_image">
@@ -302,7 +302,7 @@
             
               <div class="markdown-body">
                 
-                <h1 id="nginx中的内存的相关结构体">1.nginx中的内存的相关结构体</h1>
+                <h1 id="内存池相关结构体">1.内存池相关结构体</h1>
 <h2 id="内存池结构体ngx_pool_s">1.1 内存池结构体ngx_pool_s</h2>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ngx_pool_s</span> &#123;</span><br>    <span class="hljs-type">ngx_pool_data_t</span>       d; <span class="hljs-comment">// 记录当前内存池状态。</span><br>    <span class="hljs-type">size_t</span>                max; <span class="hljs-comment">// 判断小块内存的最大值，超过这个值就是大块内存。</span><br>    <span class="hljs-type">ngx_pool_t</span>           *current; <span class="hljs-comment">// 指向第一个没有达到4次失败的内存池对象。</span><br>    <span class="hljs-type">ngx_chain_t</span>          *chain;<br>    <span class="hljs-type">ngx_pool_large_t</span>     *large; <span class="hljs-comment">// 指向所有大块内存组成的链表。</span><br>    <span class="hljs-type">ngx_pool_cleanup_t</span>   *cleanup;<br>    <span class="hljs-type">ngx_log_t</span>            *<span class="hljs-built_in">log</span>;<br>&#125;;<br></code></pre></td></tr></table></figure>
 <h2 id="内存块结构体">1.2 内存块结构体</h2>
@@ -322,7 +322,7 @@ alt="nginx内存池结构解析" />
 <li>在分配大块内存的时候，会先调用malloc直接申请，并作为链表链接到large属性上。但如果large属性的个数已经超过了4，也就是已经超过4次调用malloc，那么之后调用的时候，不再用malloc，而是直接在内存池的空闲内存中调用小块内存的申请函数，不过size更大一些，并将这部分在内存池中申请的大块内存以头插法的方式插入到large链表上。</li>
 <li>在内存池中申请开辟的内存，不管是大块还是小块，需要释放时，必须要按照申请的倒序进行释放，以有序的回滚last指针的位置。</li>
 </ol>
-<h1 id="分配内存操作">2. 分配内存操作</h1>
+<h1 id="内存池操作">2. 内存池操作</h1>
 <h2 id="创建内存池">2.1 创建内存池</h2>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">ngx_pool_t</span> *<br><span class="hljs-title function_">ngx_create_pool</span><span class="hljs-params">(<span class="hljs-type">size_t</span> size, <span class="hljs-type">ngx_log_t</span> *<span class="hljs-built_in">log</span>)</span><br>&#123;<br>    <span class="hljs-type">ngx_pool_t</span>  *p;<br>    p = ngx_memalign(NGX_POOL_ALIGNMENT, size, <span class="hljs-built_in">log</span>); <span class="hljs-comment">// 申请地址对齐的内存</span><br>    <span class="hljs-keyword">if</span> (p == <span class="hljs-literal">NULL</span>) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>    &#125;<br>    <br>    p-&gt;d.last = (u_char *) p + <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">ngx_pool_t</span>);<br>    p-&gt;d.end = (u_char *) p + size;<br>    p-&gt;d.next = <span class="hljs-literal">NULL</span>;<br>    p-&gt;d.failed = <span class="hljs-number">0</span>;<br><br>    size = size - <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">ngx_pool_t</span>);<br>    p-&gt;max = (size &lt; NGX_MAX_ALLOC_FROM_POOL) ? size : NGX_MAX_ALLOC_FROM_POOL;<br><br>    p-&gt;current = p;<br>    p-&gt;chain = <span class="hljs-literal">NULL</span>;<br>    p-&gt;large = <span class="hljs-literal">NULL</span>;<br>    p-&gt;cleanup = <span class="hljs-literal">NULL</span>;<br>    p-&gt;<span class="hljs-built_in">log</span> = <span class="hljs-built_in">log</span>;<br><br>    <span class="hljs-keyword">return</span> p;<br>&#125;<br></code></pre></td></tr></table></figure>
 <h2 id="在内存池对象中申请内存块">2.2 在内存池对象中申请内存块</h2>
