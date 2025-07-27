@@ -19,24 +19,24 @@
   <meta name="author" content="锋">
   <meta name="keywords" content="">
   
-    <meta name="description" content="学习nginx数组的数据结构与相关用法。">
+    <meta name="description" content="学习nginx链表的数据结构与相关用法。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="nginx-数组">
-<meta property="og:url" content="https://astronaut-diode.github.io/2025/07/25/nginx-%E6%95%B0%E7%BB%84/index.html">
+<meta property="og:title" content="nginx-链表">
+<meta property="og:url" content="https://astronaut-diode.github.io/2025/07/27/nginx-%E9%93%BE%E8%A1%A8/index.html">
 <meta property="og:site_name" content="锋的博客">
-<meta property="og:description" content="学习nginx数组的数据结构与相关用法。">
+<meta property="og:description" content="学习nginx链表的数据结构与相关用法。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://astronaut-diode.github.io/img/capture/image-20250726180313845.png">
-<meta property="article:published_time" content="2025-07-25T13:03:18.000Z">
-<meta property="article:modified_time" content="2025-07-26T10:10:50.920Z">
+<meta property="og:image" content="https://astronaut-diode.github.io/img/capture/image-20250727114542608.png">
+<meta property="article:published_time" content="2025-07-27T02:39:26.000Z">
+<meta property="article:modified_time" content="2025-07-27T03:58:08.045Z">
 <meta property="article:author" content="锋">
 <meta property="article:tag" content="nginx源码分析">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://astronaut-diode.github.io/img/capture/image-20250726180313845.png">
+<meta name="twitter:image" content="https://astronaut-diode.github.io/img/capture/image-20250727114542608.png">
   
   
   
-  <title>nginx-数组 - 锋的博客</title>
+  <title>nginx-链表 - 锋的博客</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -202,7 +202,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="nginx-数组"></span>
+            <span id="subtitle" data-typed-text="nginx-链表"></span>
           
         </div>
 
@@ -218,8 +218,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-07-25 21:03" pubdate>
-          星期五, 七月 25日 2025, 9:03 晚上
+        <time datetime="2025-07-27 10:39" pubdate>
+          星期日, 七月 27日 2025, 10:39 上午
         </time>
       </span>
     
@@ -231,7 +231,7 @@
         <i class="iconfont icon-chart"></i>
         
           <!-- compatible with older versions-->
-          1.3k 字
+          934 字
         
       </span>
     
@@ -243,7 +243,7 @@
         
         
           <!-- compatible with older versions-->
-          11 分钟
+          8 分钟
         
       </span>
     
@@ -297,36 +297,36 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">nginx-数组</h1>
+            <h1 id="seo-header">nginx-链表</h1>
             
             
               <div class="markdown-body">
                 
-                <h1 id="数组相关的关键结论">1.数组相关的关键结论</h1>
+                <h1 id="链表相关的关键结论">1. 链表相关的关键结论</h1>
 <ol type="1">
-<li>数组分为两部分，数组头和数据区域，数组头是管理用的，数据区域才是记录数组元素的地址。</li>
-<li>创建数组的时候，数组头和数据区域都会通过内存池创建，所以是大块内存和小块内存还是比较关键的，决定了是否是调用了malloc等函数。而且每个元素占用多少字节，该数组中可以分配多少个元素都是固定下来的。</li>
-<li>在调用数组的插入函数时，并不是直接插入对象，而是获取该对象可以存放的内存空间地址，之后由用户自己写进去。</li>
-<li>插入数组元素时，如果数据区域内存空间不足，会进行扩容，扩容时判断数据区域是否在内存池结尾，并且检查该内存池是否还有空闲内存，如果满足，只扩容一个元素的空间，否则找一块新的内存区域进行翻倍扩容。</li>
+<li>链表分为三部分，链表头、链表节点和数据区域。首先是链表头，用于管理整个链表。其次是链表节点，这是类似于nginx_array_s的数组头，记录了实际的数据区域，并且数据区域中可以记录多个元素。</li>
+<li>第一个链表节点是嵌在链表头结构体中的，后续如果内存不足时要拓展链表，链表节点会单独开辟，以尾插法的方式插入链表。</li>
+<li>插入链表的时候，同数组一样返回可用的内存起始地址，让用户自己设置size字节的内存空间。</li>
 </ol>
 <h1
-id="数组相关结构体nginxsrccorengx_array.h">2.数组相关结构体（nginx/src/core/ngx_array.h）</h1>
-<h2 id="数组头结构体ngx_array_s">2.1 数组头结构体ngx_array_s</h2>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>    <span class="hljs-type">void</span>        *elts; <span class="hljs-comment">// 保存数组元素的内存起始地址</span><br>    <span class="hljs-type">ngx_uint_t</span>   nelts; <span class="hljs-comment">// 当前数组中已经记录了多少个元素</span><br>    <span class="hljs-type">size_t</span>       size; <span class="hljs-comment">// 该数组中每个元素可用的内存空间大小</span><br>    <span class="hljs-type">ngx_uint_t</span>   nalloc; <span class="hljs-comment">// 该数组中可以最多可以分配多少个元素</span><br>    <span class="hljs-type">ngx_pool_t</span>  *pool; <span class="hljs-comment">// 关联的内存池</span><br>&#125; <span class="hljs-type">ngx_array_t</span>;<br></code></pre></td></tr></table></figure>
-<h2 id="内存结构图">2.2 内存结构图</h2>
+id="链表相关结构体nginxsrccorengx_list.h">2.链表相关结构体(nginx/src/core/ngx_list.h)</h1>
+<h2 id="链表头结构体ngx_list_s">2.1 链表头结构体ngx_list_s</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">typedef</span> <span class="hljs-class"><span class="hljs-keyword">struct</span> &#123;</span><br>    <span class="hljs-type">ngx_list_part_t</span>  *last; <span class="hljs-comment">// 记录链表中的最后一个链表节点。</span><br>    <span class="hljs-type">ngx_list_part_t</span>   part; <span class="hljs-comment">// 记录链表中的第一个链表节点。</span><br>    <span class="hljs-type">size_t</span>            size; <span class="hljs-comment">// 记录链表中每一个链表节点，保存的每个元素为多少字节。</span><br>    <span class="hljs-type">ngx_uint_t</span>        nalloc; <span class="hljs-comment">// 记录链表中每一个链表节点，可以分配多少个节点。</span><br>    <span class="hljs-type">ngx_pool_t</span>       *pool;<br>&#125; <span class="hljs-type">ngx_list_t</span>;<br></code></pre></td></tr></table></figure>
+<h2 id="链表节点结构体ngx_list_part_s">2.2
+链表节点结构体ngx_list_part_s</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-class"><span class="hljs-keyword">struct</span> <span class="hljs-title">ngx_list_part_s</span> &#123;</span><br>    <span class="hljs-type">void</span>             *elts; <span class="hljs-comment">// 指向数据的实际存放内存地址，和数组是一个道理。</span><br>    <span class="hljs-type">ngx_uint_t</span>        nelts; <span class="hljs-comment">// 记录当前已经保存了多少个元素。</span><br>    <span class="hljs-type">ngx_list_part_t</span>  *next; <span class="hljs-comment">// 链接下一个链表节点。</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<h2 id="内存结构体">2.3 内存结构体</h2>
 <figure>
-<img src="/img/capture/image-20250726180313845.png" srcset="/img/loading.gif" lazyload
-alt="nginx数组的内存结构解析" />
-<figcaption aria-hidden="true">nginx数组的内存结构解析</figcaption>
+<img src="/img/capture/image-20250727114542608.png" srcset="/img/loading.gif" lazyload
+alt="nginx链表的内存结构解析" />
+<figcaption aria-hidden="true">nginx链表的内存结构解析</figcaption>
 </figure>
 <h1
-id="数组操作nginxsrccorengx_array.c">3.数组操作（nginx/src/core/ngx_array.c）</h1>
-<h2 id="创建数组">3.1 创建数组</h2>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">ngx_array_t</span> *<br><span class="hljs-title function_">ngx_array_create</span><span class="hljs-params">(<span class="hljs-type">ngx_pool_t</span> *p, <span class="hljs-type">ngx_uint_t</span> n, <span class="hljs-type">size_t</span> size)</span> <span class="hljs-comment">// 创建一个可以分配n个size字节大小的数组。</span><br>&#123;<br>    <span class="hljs-type">ngx_array_t</span> *a;<br><br>    a = ngx_palloc(p, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">ngx_array_t</span>)); <span class="hljs-comment">// 首先去内存池中申请数组头的结构体</span><br>    <span class="hljs-keyword">if</span> (a == <span class="hljs-literal">NULL</span>) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (ngx_array_init(a, p, n, size) != NGX_OK) &#123; <span class="hljs-comment">// 进行数组数据部分的内存申请，完成后以数组头管理该空间。</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> a;<br>&#125;<br><br><span class="hljs-type">static</span> ngx_inline <span class="hljs-type">ngx_int_t</span><br><span class="hljs-title function_">ngx_array_init</span><span class="hljs-params">(<span class="hljs-type">ngx_array_t</span> *<span class="hljs-built_in">array</span>, <span class="hljs-type">ngx_pool_t</span> *pool, <span class="hljs-type">ngx_uint_t</span> n, <span class="hljs-type">size_t</span> size)</span> <span class="hljs-comment">// 初始化数组头的内存，并申请数组空间。</span><br>&#123;<br>    <span class="hljs-comment">/*</span><br><span class="hljs-comment">     * set &quot;array-&gt;nelts&quot; before &quot;array-&gt;elts&quot;, otherwise MSVC thinks</span><br><span class="hljs-comment">     * that &quot;array-&gt;nelts&quot; may be used without having been initialized</span><br><span class="hljs-comment">     */</span><br><br>    <span class="hljs-built_in">array</span>-&gt;nelts = <span class="hljs-number">0</span>; <span class="hljs-comment">// 更新数组头中的信息，设置数组中元素的个数为0，每个元素的占用内存为size字节，最多可以分配n个。</span><br>    <span class="hljs-built_in">array</span>-&gt;size = size;<br>    <span class="hljs-built_in">array</span>-&gt;nalloc = n;<br>    <span class="hljs-built_in">array</span>-&gt;pool = pool;<br><br>    <span class="hljs-built_in">array</span>-&gt;elts = ngx_palloc(pool, n * size); <span class="hljs-comment">// 在内存池中申请n * size的连续内存空间。根据对内存池的了解，如果数组开的过大，超过了内存池的max属性，将会被判定为大内存块，会执行malloc进行申请，否则按照小块内存的方式在内存池中申请。</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">array</span>-&gt;elts == <span class="hljs-literal">NULL</span>) &#123;<br>        <span class="hljs-keyword">return</span> NGX_ERROR;<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> NGX_OK;<br>&#125;<br></code></pre></td></tr></table></figure>
-<h2 id="向数组插入元素">3.2 向数组插入元素</h2>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> *<br><span class="hljs-title function_">ngx_array_push</span><span class="hljs-params">(<span class="hljs-type">ngx_array_t</span> *a)</span> <span class="hljs-comment">// 首先，nginx的数组比较特殊，调用该函数将会返回可操作的内存地址，让用户自己插入，而非直接将元素插入数组。</span><br>&#123;<br>    <span class="hljs-type">void</span>        *elt, *new;<br>    <span class="hljs-type">size_t</span>       size;<br>    <span class="hljs-type">ngx_pool_t</span>  *p;<br><br>    <span class="hljs-keyword">if</span> (a-&gt;nelts == a-&gt;nalloc) &#123;  <span class="hljs-comment">// 先检查已分配的元素个数是否达到上限。</span><br><br>        <span class="hljs-comment">/* the array is full */</span><br><br>        size = a-&gt;size * a-&gt;nalloc; <span class="hljs-comment">// 达到上限时，需要计算该数组的实际数据区域占多少字节。</span><br><br>        p = a-&gt;pool;<br><br>        <span class="hljs-keyword">if</span> ((u_char *) a-&gt;elts + size == p-&gt;d.last<br>            &amp;&amp; p-&gt;d.last + a-&gt;size &lt;= p-&gt;d.end) <span class="hljs-comment">// 先检查数组的数据区域是否为该内存池对象分配的最后一块内存区域，并且检查该内存池是否还有一个元素的空间可分配。</span><br>        &#123;<br>            <span class="hljs-comment">/*</span><br><span class="hljs-comment">             * the array allocation is the last in the pool</span><br><span class="hljs-comment">             * and there is space for new allocation</span><br><span class="hljs-comment">             */</span><br><br>            p-&gt;d.last += a-&gt;size; <span class="hljs-comment">// 如果数组的数据区域在内存池的结尾，并且结尾的空闲区域足以让数据区域再拓展一个元素，那么直接缩减内存池的空间内存空间，并增加数组中的可分配元素个数。</span><br>            a-&gt;nalloc++;<br><br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-comment">/* allocate a new array */</span><br><br>            new = ngx_palloc(p, <span class="hljs-number">2</span> * size); <span class="hljs-comment">// 但如果数据区域并不在内存池的结尾，或者结尾剩余空间不足，那么直接在内存池中重申一个双倍元素个数的内存池。</span><br>            <span class="hljs-keyword">if</span> (new == <span class="hljs-literal">NULL</span>) &#123;<br>                <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>            &#125;<br><br>            ngx_memcpy(new, a-&gt;elts, size); <span class="hljs-comment">// 将原始的数据拷贝到新的内存地址上。</span><br>            a-&gt;elts = new; <span class="hljs-comment">// 移动原先的数据区域的指针并扩大可分配元素的个数。</span><br>            a-&gt;nalloc *= <span class="hljs-number">2</span>;<br>        &#125;<br>    &#125;<br><br>    elt = (u_char *) a-&gt;elts + a-&gt;size * a-&gt;nelts; <span class="hljs-comment">// 最终会将数据区域中用于保存新元素的内存地址计算出来并返回。</span><br>    a-&gt;nelts++; <span class="hljs-comment">// 增大数组中元素的个数。</span><br><br>    <span class="hljs-keyword">return</span> elt;<br>&#125;<br></code></pre></td></tr></table></figure>
-<h2 id="清空数组">3.3 清空数组</h2>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span><br><span class="hljs-title function_">ngx_array_destroy</span><span class="hljs-params">(<span class="hljs-type">ngx_array_t</span> *a)</span><br>&#123;<br>    <span class="hljs-type">ngx_pool_t</span>  *p;<br><br>    p = a-&gt;pool;<br><br>    <span class="hljs-keyword">if</span> ((u_char *) a-&gt;elts + a-&gt;size * a-&gt;nalloc == p-&gt;d.last) &#123; <span class="hljs-comment">// 如果数组的数据区域是该内存池的最后一块内存，那么回缩内存池的可分配内存区域起始地址，扩大空间内存。</span><br>        p-&gt;d.last -= a-&gt;size * a-&gt;nalloc;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> ((u_char *) a + <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">ngx_array_t</span>) == p-&gt;d.last) &#123; <span class="hljs-comment">// 如果数组头是否是内存池的最后一块内存区域，那么同理，回缩内存池的可分配内存区域起始地址。</span><br>        p-&gt;d.last = (u_char *) a;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+id="链表操作nginxsrccorengx_list.c">3.链表操作(nginx/src/core/ngx_list.c)</h1>
+<h2 id="创建链表">3.1 创建链表</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">ngx_list_t</span> *<br><span class="hljs-title function_">ngx_list_create</span><span class="hljs-params">(<span class="hljs-type">ngx_pool_t</span> *pool, <span class="hljs-type">ngx_uint_t</span> n, <span class="hljs-type">size_t</span> size)</span><br>&#123;<br>    <span class="hljs-type">ngx_list_t</span>  *<span class="hljs-built_in">list</span>;<br><br>    <span class="hljs-built_in">list</span> = ngx_palloc(pool, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">ngx_list_t</span>)); <span class="hljs-comment">// 首先在内存池中申请链表头的内存空间。</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">list</span> == <span class="hljs-literal">NULL</span>) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (ngx_list_init(<span class="hljs-built_in">list</span>, pool, n, size) != NGX_OK) &#123; <span class="hljs-comment">// 进行链表初始化工作。</span><br>        <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>    &#125;<br><br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">list</span>;<br>&#125;<br><br><span class="hljs-type">static</span> ngx_inline <span class="hljs-type">ngx_int_t</span><br><span class="hljs-title function_">ngx_list_init</span><span class="hljs-params">(<span class="hljs-type">ngx_list_t</span> *<span class="hljs-built_in">list</span>, <span class="hljs-type">ngx_pool_t</span> *pool, <span class="hljs-type">ngx_uint_t</span> n, <span class="hljs-type">size_t</span> size)</span><br>&#123;<br>    <span class="hljs-built_in">list</span>-&gt;part.elts = ngx_palloc(pool, n * size); <span class="hljs-comment">// 因为第一个链表节点part并非指针，所以直接开辟好了链表节点的结构体。然后申请真正的数据区域，交由链表节点进行管理。</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-built_in">list</span>-&gt;part.elts == <span class="hljs-literal">NULL</span>) &#123;<br>        <span class="hljs-keyword">return</span> NGX_ERROR;<br>    &#125;<br><br>    <span class="hljs-built_in">list</span>-&gt;part.nelts = <span class="hljs-number">0</span>; <span class="hljs-comment">// 设置链表节点中的元素个数为0。</span><br>    <span class="hljs-built_in">list</span>-&gt;part.next = <span class="hljs-literal">NULL</span>; <span class="hljs-comment">// 设置链表节点的下一个链表节点为空。</span><br>    <span class="hljs-built_in">list</span>-&gt;last = &amp;<span class="hljs-built_in">list</span>-&gt;part; <span class="hljs-comment">// 设置链表中的最后一个链表节点为第一个链表节点。</span><br>    <span class="hljs-built_in">list</span>-&gt;size = size; <span class="hljs-comment">// 登记链表中每一个链表节点存储的元素个数和元素占用字节数。</span><br>    <span class="hljs-built_in">list</span>-&gt;nalloc = n;<br>    <span class="hljs-built_in">list</span>-&gt;pool = pool; <span class="hljs-comment">// 登记是在哪个内存池中创建的链表。</span><br><br>    <span class="hljs-keyword">return</span> NGX_OK;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="向链表插入元素">3.2 向链表插入元素</h2>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">void</span> *<br><span class="hljs-title function_">ngx_list_push</span><span class="hljs-params">(<span class="hljs-type">ngx_list_t</span> *l)</span><br>&#123;<br>    <span class="hljs-type">void</span>             *elt;<br>    <span class="hljs-type">ngx_list_part_t</span>  *last;<br><br>    last = l-&gt;last; <span class="hljs-comment">// 取出最后一个链表元素，因为链表没有释放的函数，前面申请占用后的内存空间都无法复用，所以能够申请内存的链表节点一定是最后一个。</span><br><br>    <span class="hljs-keyword">if</span> (last-&gt;nelts == l-&gt;nalloc) &#123; <span class="hljs-comment">// 如果该链表节点已经存满了，进行扩容。</span><br><br>        <span class="hljs-comment">/* the last part is full, allocate a new list part */</span><br><br>        last = ngx_palloc(l-&gt;pool, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">ngx_list_part_t</span>)); <span class="hljs-comment">// 重新在内存池中申请一个链表节点。</span><br>        <span class="hljs-keyword">if</span> (last == <span class="hljs-literal">NULL</span>) &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>        &#125;<br><br>        last-&gt;elts = ngx_palloc(l-&gt;pool, l-&gt;nalloc * l-&gt;size); <span class="hljs-comment">// 进一步申请一个数据区域，大小根据链表中记录的每元素字节数和元素个数计算。</span><br>        <span class="hljs-keyword">if</span> (last-&gt;elts == <span class="hljs-literal">NULL</span>) &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-literal">NULL</span>;<br>        &#125;<br><br>        last-&gt;nelts = <span class="hljs-number">0</span>; <span class="hljs-comment">// 更新该链表节点的已分配元素个数和下一个链表节点关联关系。</span><br>        last-&gt;next = <span class="hljs-literal">NULL</span>;<br><br>        l-&gt;last-&gt;next = last; <span class="hljs-comment">// 将新开辟的数据区域插入到链表中。</span><br>        l-&gt;last = last;<br>    &#125;<br><br>    elt = (<span class="hljs-type">char</span> *) last-&gt;elts + l-&gt;size * last-&gt;nelts; <span class="hljs-comment">// 计算出可以用于保存数据的内存起始地址，之后返回交给用户自己插入。</span><br>    last-&gt;nelts++; <span class="hljs-comment">// 记录链表节点中的元素个数。</span><br><br>    <span class="hljs-keyword">return</span> elt;<br>&#125;<br></code></pre></td></tr></table></figure>
 
                 
               </div>
@@ -372,8 +372,8 @@ id="数组操作nginxsrccorengx_array.c">3.数组操作（nginx/src/core/ngx_arr
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>nginx-数组</div>
-      <div>https://astronaut-diode.github.io/2025/07/25/nginx-数组/</div>
+      <div>nginx-链表</div>
+      <div>https://astronaut-diode.github.io/2025/07/27/nginx-链表/</div>
     </div>
     <div class="license-meta">
       
@@ -385,7 +385,7 @@ id="数组操作nginxsrccorengx_array.c">3.数组操作（nginx/src/core/ngx_arr
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年7月25日</div>
+          <div>2025年7月27日</div>
         </div>
       
       
@@ -417,18 +417,12 @@ id="数组操作nginxsrccorengx_array.c">3.数组操作（nginx/src/core/ngx_arr
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/07/27/nginx-%E9%93%BE%E8%A1%A8/" title="nginx-链表">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">nginx-链表</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/06/29/nginx-%E5%86%85%E5%AD%98%E6%B1%A0/" title="nginx-内存池">
-                        <span class="hidden-mobile">nginx-内存池</span>
+                      <a href="/2025/07/25/nginx-%E6%95%B0%E7%BB%84/" title="nginx-数组">
+                        <span class="hidden-mobile">nginx-数组</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
@@ -526,7 +520,7 @@ id="数组操作nginxsrccorengx_array.c">3.数组操作（nginx/src/core/ngx_arr
       
         <a href="/2025/07/25/nginx-%E6%95%B0%E7%BB%84/" title="nginx-数组"
            class="list-group-item list-group-item-action
-           active">
+           ">
           <span class="category-post">nginx-数组</span>
         </a>
       
@@ -544,7 +538,7 @@ id="数组操作nginxsrccorengx_array.c">3.数组操作（nginx/src/core/ngx_arr
       
         <a href="/2025/07/27/nginx-%E9%93%BE%E8%A1%A8/" title="nginx-链表"
            class="list-group-item list-group-item-action
-           ">
+           active">
           <span class="category-post">nginx-链表</span>
         </a>
       
